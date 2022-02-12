@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { letters, status } from './constants'
+import { letters, status, wordle_answers } from './constants'
 import { Keyboard } from './components/Keyboard'
 import words from './data/words'
 
@@ -63,7 +63,6 @@ const getOGDay = () => {
   return diffDays
 }
 
-const wordle_answers = ["rebut", "sissy", "humph", "awake", "blush", "focal", "evade", "naval", "serve", "heath", "dwarf", "model", "karma", "stink", "grade", "quiet", "bench", "abate", "feign", "major", "death", "fresh", "crust", "stool", "colon", "abase", "marry", "react", "batty", "pride", "floss", "helix", "croak", "staff", "paper", "unfed", "whelp", "trawl", "outdo", "adobe", "crazy", "sower", "repay", "digit", "crate", "cluck", "spike", "mimic", "pound", "maxim", "linen", "unmet", "flesh", "booby", "forth", "first", "stand", "belly", "ivory", "seedy", "print", "yearn", "drain", "bribe", "stout", "panel", "crass", "flume", "offal", "agree", "error", "swirl", "argue", "bleed", "delta", "flick", "totem", "wooer", "front", "shrub", "parry", "biome", "lapel", "start", "greet", "goner", "golem", "lusty", "loopy", "round", "audit", "lying", "gamma", "labor", "islet", "civic", "forge", "corny", "moult", "basic", "salad", "agate", "spicy", "spray", "essay", "fjord", "spend", "kebab", "guild", "aback", "motor", "alone", "hatch", "hyper", "thumb", "dowry", "ought", "belch", "dutch", "pilot", "tweed", "comet", "jaunt", "enema", "steed", "abyss", "growl", "fling", "dozen", "boozy", "erode", "world", "gouge", "click", "briar", "great", "altar", "pulpy", "blurt", "coast", "duchy", "groin", "fixer", "group", "rogue", "badly", "smart", "pithy", "gaudy", "chill", "heron", "vodka", "finer", "surer", "radio", "rouge", "perch", "retch", "wrote", "clock", "tilde", "store", "prove", "bring", "solve", "cheat", "grime", "exult", "usher", "epoch", "triad", "break", "rhino", "viral", "conic", "masse", "sonic", "vital", "trace", "using", "peach", "champ", "baton", "brake", "pluck", "craze", "gripe", "weary", "picky", "acute", "ferry", "aside", "tapir", "troll", "unify", "rebus", "boost", "truss", "siege", "tiger", "banal", "slump", "crank", "gorge", "query", "drink", "favor", "abbey", "tangy", "panic", "solar", "shire", "proxy", "point", "robot", "prick", "wince", "crimp", "knoll", "sugar", "whack", "mount", "perky", "could", "wrung", "light", "those", "moist", "shard", "pleat", "aloft", "skill", "elder", "frame", "humor", "pause", "ulcer", "ultra", "robin", "cynic", "aroma", "caulk", "shake", "dodge", "swill", "tacit", "other", "thorn", "trove", "bloke", "vivid", "spill", "chant", "choke", "rupee", "nasty", "mourn", "ahead", "brine", "cloth", "hoard", "sweet", "month", "lapse", "watch", "today", "focus", "smelt", "tease", "cater", "movie", "saute", "allow", "renew", "their", "slosh", "purge", "chest", "depot", "epoxy", "nymph", "found", "shall", "harry", "stove", "lowly", "snout", "trope", "fewer", "shawl", "natal", "comma", "foray", "scare", "stair", "black", "squad", "royal", "chunk", "mince", "shame", "cheek", "ample", "flair", "foyer", "cargo", "oxide", "plant", "olive", "inert", "askew", "heist", "shown", "zesty", "hasty", "trash", "fella", "larva", "forgo", "story", "hairy", "train", "homer", "badge", "midst", "canny", "fetus", "butch", "farce", "slung", "tipsy", "metal", "yield", "delve", "being", "scour", "glass", "gamer", "scrap", "money", "hinge", "album", "vouch", "asset", "tiara", "crept", "bayou", "atoll", "manor", "creak", "showy", "phase", "froth", "depth", "gloom", "flood", "trait", "girth", "piety", "payer", "goose", "float", "donor", "atone", "primo", "apron", "blown", "cacao", "loser", "input", "gloat", "awful", "brink", "smite", "beady", "rusty", "retro", "droll", "gawky", "hutch", "pinto", "gaily", "egret", "lilac", "sever", "field", "fluff", "hydro", "flack", "agape", "voice", "stead", "stalk", "berth", "madam", "night", "bland", "liver", "wedge", "augur", "roomy", "wacky", "flock", "angry", "bobby", "trite", "aphid", "tryst", "midge", "power", "elope", "cinch", "motto", "stomp", "upset", "bluff", "cramp", "quart", "coyly", "youth", "rhyme", "buggy", "alien", "smear", "unfit", "patty", "cling", "glean", "label", "hunky", "khaki", "poker", "gruel", "twice", "twang", "shrug", "treat", "unlit", "waste", "merit", "woven", "octal", "needy", "clown", "widow", "irony", "ruder", "gauze", "chief", "onset", "prize", "fungi", "charm", "gully", "inter", "whoop", "taunt", "leery", "class", "theme", "lofty", "tibia", "booze", "alpha", "thyme", "eclat", "doubt", "parer", "chute", "stick", "trice", "alike", "sooth", "recap", "saint", "liege", "glory", "grate", "admit", "brisk", "soggy", "usurp", "scald", "scorn", "leave", "twine", "sting", "bough", "marsh", "sloth", "dandy", "vigor", "howdy", "enjoy"]
 var day;
 const og_day = getOGDay()
 setDay(getDay(og_day));
@@ -423,278 +422,139 @@ function App() {
     html.setAttribute( 'class', 'bg' );
   }
 
-  if (window.innerWidth < 600) {
-    return (
-      <div className={darkMode ? 'dark h-fill' : 'h-fill'}>
-        <div className={`flex flex-col justify-between h-fill bg-background dark:bg-background-dark`}>
-          <header className="flex items-center py-2 px-3 text-primary dark:text-primary-dark">
-            <button type="button" onClick={() => setSettingsModalIsOpen(true)}>
-              <Settings />
+  return (
+    <div className={darkMode ? 'dark h-fill' : 'h-fill'}>
+      <div className={`flex flex-col justify-between h-fill bg-background dark:bg-background-dark`}>
+        <header className="flex items-center py-2 px-3 text-primary dark:text-primary-dark">
+          <button type="button" onClick={() => setSettingsModalIsOpen(true)}>
+            <Settings />
+          </button>
+          <h1 className={"flex-1 text-center text-l xxs:text-lg sm:text-3xl tracking-wide font-bold font-og"}>
+            WORDLE ARCHIVE {day} {header_symbol}
+          </h1>
+          <button className="mr-2" type="button" onClick={() => setIsOpen(true)}>
+            <Share />
+          </button>
+          <button type="button" onClick={() => setInfoModalIsOpen(true)}>
+            <Info />
+          </button>
+        </header>
+        <div className="flex flex-force-center items-center py-3">
+          <div className="flex items-center px-2">
+            <button
+              type="button"
+              className="rounded px-2 py-2 mt-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
+              onClick={playPrevious}>Previous
             </button>
-            <h1 className={"flex-1 text-center text-l xxs:text-lg sm:text-3xl tracking-wide font-bold font-og"}>
-              WORDLE ARCHIVE {day} {header_symbol}
-            </h1>
-            <button className="mr-2" type="button" onClick={() => setIsOpen(true)}>
-              <Share />
+          </div>
+          <div className="flex items-center px-2">
+            <button
+              type="button"
+              className="rounded px-2 py-2 mt-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
+              onClick={playRandom}>Random
             </button>
-            <button type="button" onClick={() => setInfoModalIsOpen(true)}>
-              <Info />
+          </div>
+          <div className="flex items-center px-2">
+            <button
+              type="button"
+              className="rounded px-2 py-2 mt-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
+              onClick={playNext}>Next
             </button>
-          </header>
-          <div className="flex flex-force-center items-center py-3">
-            <div className="flex items-center px-2">
-              <button
-                type="button"
-                className="rounded px-2 py-2 mt-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-                onClick={playPrevious}>Previous
-              </button>
-            </div>
-            <div className="flex items-center px-2">
-              <button
-                type="button"
-                className="rounded px-2 py-2 mt-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-                onClick={playRandom}>Random
-              </button>
-            </div>
-            <div className="flex items-center px-2">
-              <button
-                type="button"
-                className="rounded px-2 py-2 mt-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-                onClick={playNext}>Next
-              </button>
-            </div>
           </div>
-           <div className="flex flex-force-center items-center py-3">
-            <div className="flex items-center px-2">
-              <button
-                type="button"
-                className="rounded px-2 py-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-                onClick={playFirst}>First
-              </button>
-            </div>
-            <div className="flex items-center px-2">
-              <Menu as="div" className="relative inline-block text-left">
-                <div>
-                  <Menu.Button className="blurthis rounded px-2 py-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark">
-                    Choose
-                  </Menu.Button>
-                </div>
-                  <Menu.Items className="origin-top-right absolute right-0 mt-2 w-42 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none overflow-y-scroll h-56">
-                    <div className="py-1">
-                      {elements}
-                    </div>
-                  </Menu.Items>
-              </Menu>
-            </div>
-            <div className="flex items-center px-2">
-              <button
-                type="button"
-                className="rounded px-2 py-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-                onClick={playLast}>Last
-              </button>
-            </div>
-          </div>
-          <div className="flex items-center flex-col py-4">
-            <div className="grid grid-cols-5 grid-flow-row gap-4">
-              {board.map((row, rowNumber) =>
-                row.map((letter, colNumber) => (
-                  <span
-                    key={colNumber}
-                    className={`${getCellStyles(
-                      rowNumber,
-                      colNumber,
-                      letter
-                    )} inline-flex items-center font-medium justify-center text-xl w-[14vw] h-[14vw] xs:w-14 xs:h-14 sm:w-20 sm:h-20 rounded`}
-                  >
-                    {letter}
-                  </span>
-                ))
-              )}
-            </div>
-          </div>
-          <InfoModal
-            isOpen={infoModalIsOpen}
-            handleClose={handleInfoClose}
-            darkMode={darkMode}
-            colorBlindMode={colorBlindMode}
-            styles={modalStyles}
-          />
-          <EndGameModal
-            isOpen={modalIsOpen}
-            handleClose={closeModal}
-            styles={modalStyles}
-            darkMode={darkMode}
-            gameState={gameState}
-            state={state}
-            currentStreak={currentStreak}
-            longestStreak={longestStreak}
-            answer={answer}
-            playAgain={() => {
-              closeModal()
-              streakUpdated.current = false
-            }}
-            day={day}
-            currentRow={currentRow}
-            cellStatuses={cellStatuses}
-          />
-          <SettingsModal
-            isOpen={settingsModalIsOpen}
-            handleClose={() => setSettingsModalIsOpen(false)}
-            styles={modalStyles}
-            darkMode={darkMode}
-            toggleDarkMode={toggleDarkMode}
-            colorBlindMode={colorBlindMode}
-            toggleColorBlindMode={toggleColorBlindMode}
-          />
-          <Keyboard
-            letterStatuses={letterStatuses}
-            addLetter={addLetter}
-            onEnterPress={onEnterPress}
-            onDeletePress={onDeletePress}
-            gameDisabled={gameState !== state.playing}
-            colorBlindMode={colorBlindMode}
-          />
         </div>
-      </div>
-    )
-  }
-  else {
-    return (
-      <div className={darkMode ? 'dark h-fill' : 'h-fill'}>
-        <div className={`flex flex-col justify-between h-fill bg-background dark:bg-background-dark`}>
-          <header className="flex items-center py-2 px-3 text-primary dark:text-primary-dark">
-            <button type="button" onClick={() => setSettingsModalIsOpen(true)}>
-              <Settings />
+         <div className="flex flex-force-center items-center py-3">
+          <div className="flex items-center px-2">
+            <button
+              type="button"
+              className="rounded px-2 py-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
+              onClick={playFirst}>First
             </button>
-            <h1 className={"flex-1 text-center text-xl xxs:text-2xl -mr-6 sm:text-4xl tracking-wide font-bold font-og"}>
-              WORDLE ARCHIVE {day}  {header_symbol}
-            </h1>
-            <button className="mr-6" type="button" onClick={() => setIsOpen(true)}>
-              <Share />
-            </button>
-            <button type="button" onClick={() => setInfoModalIsOpen(true)}>
-              <Info />
-            </button>
-          </header>
-          <div className="flex flex-force-center items-center py-3">
-            <div className="flex items-center px-3">
-              <button
-                type="button"
-                className="rounded px-3 py-2 mt-4 w-32 text-lg nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-                onClick={playFirst}>First
-              </button>
-            </div>
-            <div className="flex items-center px-3">
-              <button
-                type="button"
-                className="rounded px-3 py-2 mt-4 w-32 text-lg nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-                onClick={playPrevious}>Previous
-              </button>
-            </div>
-            <div className="flex items-center px-3">
-              <Menu as="div" className="relative inline-block text-left">
-                <div>
-                  <Menu.Button className="blurthis rounded px-3 py-2 mt-4 w-32 text-lg nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark">
-                    Choose
-                  </Menu.Button>
-                </div>
-                  <Menu.Items className="origin-top-right absolute right-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none overflow-y-scroll h-56">
-                    <div className="py-1">
-                      <Menu.Item key={i}>
-                        {({ active }) =>
-                          (
-                            <a onMouseDown={() => playRandom()} className=
-                              {
-                                classNames(active ? 'font-bold text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm')
-                              }>Random
-                            </a>
-                          )
-                        }
-                      </Menu.Item>
-                      {elements}
-                    </div>
-                  </Menu.Items>
-              </Menu>
-            </div>
-            <div className="flex items-center px-3">
-              <button
-                type="button"
-                className="rounded px-3 py-2 mt-4 w-32 text-lg nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-                onClick={playNext}>Next
-              </button>
-            </div>
-            <div className="flex items-center px-3">
-              <button
-                type="button"
-                className="rounded px-3 py-2 mt-4 w-32 text-lg nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-                onClick={playLast}>Last
-              </button>
-            </div>
           </div>
-          <div className="flex items-center flex-col py-4">
-            <div className="grid grid-cols-5 grid-flow-row gap-4">
-              {board.map((row, rowNumber) =>
-                row.map((letter, colNumber) => (
-                  <span
-                    key={colNumber}
-                    className={`${getCellStyles(
-                      rowNumber,
-                      colNumber,
-                      letter
-                    )} inline-flex items-center font-bold justify-center text-3xl w-[14vw] h-[14vw] xs:w-14 xs:h-14 sm:w-20 sm:h-20 rounded`}
-                  >
-                    {letter}
-                  </span>
-                ))
-              )}
-            </div>
+          <div className="flex items-center px-2">
+            <Menu as="div" className="relative inline-block text-left">
+              <div>
+                <Menu.Button className="blurthis rounded px-2 py-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark">
+                  Choose
+                </Menu.Button>
+              </div>
+                <Menu.Items className="origin-top-right absolute right-0 mt-2 w-42 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none overflow-y-scroll h-56">
+                  <div className="py-1">
+                    {elements}
+                  </div>
+                </Menu.Items>
+            </Menu>
           </div>
-          <InfoModal
-            isOpen={infoModalIsOpen}
-            handleClose={handleInfoClose}
-            darkMode={darkMode}
-            colorBlindMode={colorBlindMode}
-            styles={modalStyles}
-          />
-          <EndGameModal
-            isOpen={modalIsOpen}
-            handleClose={closeModal}
-            styles={modalStyles}
-            darkMode={darkMode}
-            gameState={gameState}
-            state={state}
-            currentStreak={currentStreak}
-            longestStreak={longestStreak}
-            answer={answer}
-            playAgain={() => {
-              closeModal()
-              streakUpdated.current = false
-            }}
-            day={day}
-            currentRow={currentRow}
-            cellStatuses={cellStatuses}
-          />
-          <SettingsModal
-            isOpen={settingsModalIsOpen}
-            handleClose={() => setSettingsModalIsOpen(false)}
-            styles={modalStyles}
-            darkMode={darkMode}
-            toggleDarkMode={toggleDarkMode}
-            colorBlindMode={colorBlindMode}
-            toggleColorBlindMode={toggleColorBlindMode}
-          />
-          <Keyboard
-            letterStatuses={letterStatuses}
-            addLetter={addLetter}
-            onEnterPress={onEnterPress}
-            onDeletePress={onDeletePress}
-            gameDisabled={gameState !== state.playing}
-            colorBlindMode={colorBlindMode}
-          />
+          <div className="flex items-center px-2">
+            <button
+              type="button"
+              className="rounded px-2 py-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
+              onClick={playLast}>Last
+            </button>
+          </div>
         </div>
+        <div className="flex items-center flex-col py-4">
+          <div className="grid grid-cols-5 grid-flow-row gap-4">
+            {board.map((row, rowNumber) =>
+              row.map((letter, colNumber) => (
+                <span
+                  key={colNumber}
+                  className={`${getCellStyles(
+                    rowNumber,
+                    colNumber,
+                    letter
+                  )} inline-flex items-center font-medium justify-center text-xl w-[14vw] h-[14vw] xs:w-14 xs:h-14 sm:w-20 sm:h-20 rounded`}
+                >
+                  {letter}
+                </span>
+              ))
+            )}
+          </div>
+        </div>
+        <InfoModal
+          isOpen={infoModalIsOpen}
+          handleClose={handleInfoClose}
+          darkMode={darkMode}
+          colorBlindMode={colorBlindMode}
+          styles={modalStyles}
+        />
+        <EndGameModal
+          isOpen={modalIsOpen}
+          handleClose={closeModal}
+          styles={modalStyles}
+          darkMode={darkMode}
+          gameState={gameState}
+          state={state}
+          currentStreak={currentStreak}
+          longestStreak={longestStreak}
+          answer={answer}
+          playAgain={() => {
+            closeModal()
+            streakUpdated.current = false
+          }}
+          day={day}
+          currentRow={currentRow}
+          cellStatuses={cellStatuses}
+        />
+        <SettingsModal
+          isOpen={settingsModalIsOpen}
+          handleClose={() => setSettingsModalIsOpen(false)}
+          styles={modalStyles}
+          darkMode={darkMode}
+          toggleDarkMode={toggleDarkMode}
+          colorBlindMode={colorBlindMode}
+          toggleColorBlindMode={toggleColorBlindMode}
+        />
+        <Keyboard
+          letterStatuses={letterStatuses}
+          addLetter={addLetter}
+          onEnterPress={onEnterPress}
+          onDeletePress={onDeletePress}
+          gameDisabled={gameState !== state.playing}
+          colorBlindMode={colorBlindMode}
+        />
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 export default App
