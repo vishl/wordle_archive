@@ -4,15 +4,12 @@ import { Keyboard } from './components/Keyboard'
 import words from './data/words'
 
 import { useLocalStorage } from './hooks/useLocalStorage'
-import { ReactComponent as Info } from './data/Info.svg'
-import { ReactComponent as Settings } from './data/Settings.svg'
-import { ReactComponent as Share } from './data/Share.svg'
-
-import { InfoModal } from './components/InfoModal'
-import { SettingsModal } from './components/SettingsModal'
 import { EndGameModal } from './components/EndGameModal'
+import { Header } from './components/Header'
 
 import { Menu, Transition } from '@headlessui/react'
+
+import { modalStyles, modalStylesDark } from './styles'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -111,16 +108,9 @@ function App() {
   const [longestStreak, setLongestStreak] = useLocalStorage('longest-streak', 0)
   const streakUpdated = useRef(false)
   const [modalIsOpen, setIsOpen] = useState(false)
-  const [firstTime, setFirstTime] = useLocalStorage('first-time', true)
-  const [infoModalIsOpen, setInfoModalIsOpen] = useState(firstTime)
-  const [settingsModalIsOpen, setSettingsModalIsOpen] = useState(false)
 
   const openModal = () => setIsOpen(true)
   const closeModal = () => setIsOpen(false)
-  const handleInfoClose = () => {
-    setFirstTime(false)
-    setInfoModalIsOpen(false)
-  }
 
   const [darkMode, setDarkMode] = useLocalStorage('dark-mode', false)
   const toggleDarkMode = () => {
@@ -130,6 +120,10 @@ function App() {
   const [colorBlindMode, setColorblindMode] = useLocalStorage('colorblind-mode', false)
   const toggleColorBlindMode = () => {
     setColorblindMode((prev) => !prev)
+  }
+
+  const toggleShareModal = () => {
+    openModal()
   }
 
   useEffect(() => {
@@ -327,36 +321,6 @@ function App() {
     })
   }
 
-  const modalStyles = {
-    overlay: {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: darkMode ? 'hsl(231, 16%, 25%)' : 'hsl(231, 16%, 92%)',
-    },
-    content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      transform: 'translate(-50%, -50%)',
-      height: 'calc(100% - 2rem)',
-      width: 'calc(100% - 2rem)',
-      backgroundColor: darkMode ? 'hsl(231, 16%, 25%)' : 'hsl(231, 16%, 92%)',
-      boxShadow: `${
-        darkMode
-          ? '0.2em 0.2em calc(0.2em * 2) #252834, calc(0.2em * -1) calc(0.2em * -1) calc(0.2em * 2) #43475C'
-          : '0.2em 0.2em calc(0.2em * 2) #A3A7BD, calc(0.2em * -1) calc(0.2em * -1) calc(0.2em * 2) #FFFFFF'
-      }`,
-      border: 'none',
-      borderRadius: '1rem',
-      maxWidth: '475px',
-      maxHeight: '650px',
-      position: 'relative',
-    },
-  }
 
   const play = () => {
     setAnswer(initialStates.answer)
@@ -413,32 +377,28 @@ function App() {
     );
   });
 
+  var html;
   if (darkMode == true) {
-    var html = document.getElementsByTagName( 'html' )[0]; // '0' to assign the first (and only `HTML` tag)
+    html = document.getElementsByTagName( 'html' )[0]; // '0' to assign the first (and only `HTML` tag)
     html.setAttribute( 'class', 'dark-bg' );
   }
   else {
-    var html = document.getElementsByTagName( 'html' )[0]; // '0' to assign the first (and only `HTML` tag)
+    html = document.getElementsByTagName( 'html' )[0]; // '0' to assign the first (and only `HTML` tag)
     html.setAttribute( 'class', 'bg' );
   }
 
   return (
     <div className={darkMode ? 'dark h-fill' : 'h-fill'}>
       <div className={`flex flex-col justify-between h-fill bg-background dark:bg-background-dark`}>
-        <header className="flex items-center py-2 px-3 text-primary dark:text-primary-dark">
-          <button type="button" onClick={() => setSettingsModalIsOpen(true)}>
-            <Settings />
-          </button>
-          <h1 className={"flex-1 text-center text-l xxs:text-lg sm:text-3xl tracking-wide font-bold font-og"}>
-            WORDLE ARCHIVE {day} {header_symbol}
-          </h1>
-          <button className="mr-2" type="button" onClick={() => setIsOpen(true)}>
-            <Share />
-          </button>
-          <button type="button" onClick={() => setInfoModalIsOpen(true)}>
-            <Info />
-          </button>
-        </header>
+        <Header
+          day={day}
+          header_symbol={header_symbol}
+          toggleDarkMode={toggleDarkMode}
+          darkMode={darkMode}
+          colorBlindMode={colorBlindMode}
+          toggleColorBlindMode={toggleColorBlindMode}
+          toggleShareModal={toggleShareModal}
+        />
         <div className="flex flex-force-center items-center py-3">
           <div className="flex items-center px-2">
             <button
@@ -510,17 +470,10 @@ function App() {
             )}
           </div>
         </div>
-        <InfoModal
-          isOpen={infoModalIsOpen}
-          handleClose={handleInfoClose}
-          darkMode={darkMode}
-          colorBlindMode={colorBlindMode}
-          styles={modalStyles}
-        />
         <EndGameModal
           isOpen={modalIsOpen}
           handleClose={closeModal}
-          styles={modalStyles}
+          styles={ darkMode ? modalStylesDark : modalStyles}
           darkMode={darkMode}
           gameState={gameState}
           state={state}
@@ -534,15 +487,6 @@ function App() {
           day={day}
           currentRow={currentRow}
           cellStatuses={cellStatuses}
-        />
-        <SettingsModal
-          isOpen={settingsModalIsOpen}
-          handleClose={() => setSettingsModalIsOpen(false)}
-          styles={modalStyles}
-          darkMode={darkMode}
-          toggleDarkMode={toggleDarkMode}
-          colorBlindMode={colorBlindMode}
-          toggleColorBlindMode={toggleColorBlindMode}
         />
         <Keyboard
           letterStatuses={letterStatuses}
