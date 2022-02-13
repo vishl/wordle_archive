@@ -12,6 +12,28 @@ import { Transition } from '@headlessui/react'
 
 import { modalStyles, modalStylesDark } from './styles'
 
+// Import the functions you need from the SDKs you need
+import { initializeApp as fbInit } from "firebase/app";
+import { getAnalytics as fbGetAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: process.env.FB_APIKEY,
+  authDomain: process.env.FB_AUTHDOMAIN,
+  projectId: process.env.FB_PROJECTID,
+  storageBucket: process.env.FB_STORAGEBUCKET,
+  messagingSenderId: process.env.FB_MESSAGINGSENDERID,
+  appId: process.env.FB_APPID,
+  measurementId: process.env.FB_MEASUREMENTID
+};
+
+// Initialize Firebase
+const fbApp = fbInit(firebaseConfig);
+const fbAnalytics = fbGetAnalytics(fbApp);
+
 const getDayAnswer = (day_) => {
   return wordle_answers[day_-1].toUpperCase()
 }
@@ -52,7 +74,7 @@ const getOGDay = () => {
 }
 
 var day;
-const og_day = getOGDay()
+const og_day = getOGDay() //This is today
 setDay(getDay(og_day));
 var items_list = []
 for (var i=1;i<=og_day;i++) {
@@ -268,6 +290,19 @@ function App() {
     })
   }
 
+  const onGameOver = () => {
+    let st = {
+      answer: answer,
+      gameState: gameState,
+      board: board,
+      cellStatuses: cellStatuses,
+      letterStatuses: letterStatuses
+    }
+    console.log(st);
+    //TODO: actually store it to firebase
+  }
+
+
   const isRowAllGreen = (row) => {
     return row.every((cell) => cell === status.green)
   }
@@ -285,11 +320,13 @@ function App() {
       var newGameStateList = JSON.parse(localStorage.getItem('gameStateList'))
       newGameStateList[day-1] = state.won
       localStorage.setItem('gameStateList', JSON.stringify(newGameStateList))
+      onGameOver();
     } else if (currentRow === 6) {
       setGameState(state.lost)
       var newGameStateList = JSON.parse(localStorage.getItem('gameStateList'))
       newGameStateList[day-1] = state.lost
       localStorage.setItem('gameStateList', JSON.stringify(newGameStateList))
+      onGameOver();
     }
   }, [cellStatuses, currentRow])
 
