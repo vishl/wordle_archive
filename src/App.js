@@ -1,25 +1,16 @@
 import { useEffect, useState, useRef } from 'react'
-import { letters, status, wordle_answers } from './constants'
+import { letters, status, wordle_answers, state} from './constants'
 import { Keyboard } from './components/Keyboard'
 import words from './data/words'
 
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { EndGameModal } from './components/EndGameModal'
 import { Header } from './components/Header'
+import { Nav } from './components/Nav'
 
-import { Menu, Transition } from '@headlessui/react'
+import { Transition } from '@headlessui/react'
 
 import { modalStyles, modalStylesDark } from './styles'
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
-
-const state = {
-  playing: 'playing',
-  won: 'won',
-  lost: 'lost',
-}
 
 const getDayAnswer = (day_) => {
   return wordle_answers[day_-1].toUpperCase()
@@ -361,22 +352,6 @@ function App() {
 
   var header_symbol = (tempGameStateList[day-1] == 'won') ? ('✔') : ((tempGameStateList[day-1] == 'lost') ? ('✘') : '')
 
-  var elements = items_list.map(i => {
-    return (
-      <Menu.Item key={i}>
-        {({ active }) =>
-          (
-            <a onMouseDown={() => playDay(i)} className=
-              {
-                classNames(active ? 'font-bold text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm '+tempGameStateList[i-1])
-              }>{i+((tempGameStateList[i-1] == state.won) ? ' ✔' : ((tempGameStateList[i-1] == state.lost) ? ' ✘' : ''))}
-            </a>
-          )
-        }
-      </Menu.Item>
-    );
-  });
-
   var html;
   if (darkMode == true) {
     html = document.getElementsByTagName( 'html' )[0]; // '0' to assign the first (and only `HTML` tag)
@@ -399,59 +374,17 @@ function App() {
           toggleColorBlindMode={toggleColorBlindMode}
           toggleShareModal={toggleShareModal}
         />
-        <div className="flex flex-force-center items-center py-3">
-          <div className="flex items-center px-2">
-            <button
-              type="button"
-              className="rounded px-2 py-2 mt-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-              onClick={playPrevious}>Previous
-            </button>
-          </div>
-          <div className="flex items-center px-2">
-            <button
-              type="button"
-              className="rounded px-2 py-2 mt-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-              onClick={playRandom}>Random
-            </button>
-          </div>
-          <div className="flex items-center px-2">
-            <button
-              type="button"
-              className="rounded px-2 py-2 mt-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-              onClick={playNext}>Next
-            </button>
-          </div>
-        </div>
-         <div className="flex flex-force-center items-center py-3">
-          <div className="flex items-center px-2">
-            <button
-              type="button"
-              className="rounded px-2 py-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-              onClick={playFirst}>First
-            </button>
-          </div>
-          <div className="flex items-center px-2">
-            <Menu as="div" className="relative inline-block text-left">
-              <div>
-                <Menu.Button className="blurthis rounded px-2 py-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark">
-                  Choose
-                </Menu.Button>
-              </div>
-                <Menu.Items className="origin-top-right absolute right-0 mt-2 w-42 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none overflow-y-scroll h-56">
-                  <div className="py-1">
-                    {elements}
-                  </div>
-                </Menu.Items>
-            </Menu>
-          </div>
-          <div className="flex items-center px-2">
-            <button
-              type="button"
-              className="rounded px-2 py-2 w-24 text-sm nm-flat-background dark:nm-flat-background-dark hover:nm-inset-background dark:hover:nm-inset-background-dark text-primary dark:text-primary-dark"
-              onClick={playLast}>Last
-            </button>
-          </div>
-        </div>
+
+        <Nav
+          playPrevious = {playPrevious}
+          playRandom   = {playRandom}
+          playNext     = {playNext}
+          playLast     = {playLast}
+          playFirst    = {playFirst}
+          items_list   = {items_list}
+          gameStateList = {tempGameStateList}
+        />
+
         <div className="flex items-center flex-col py-4">
           <div className="grid grid-cols-5 grid-flow-row gap-4">
             {board.map((row, rowNumber) =>
