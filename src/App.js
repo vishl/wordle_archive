@@ -15,8 +15,8 @@ import { modalStyles, modalStylesDark } from './styles'
 // Import the functions you need from the SDKs you need
 import { initializeApp as fbInit } from "firebase/app";
 import { getAnalytics as fbGetAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getAuth, signInAnonymously, onAuthStateChanged} from "firebase/auth";
+
 
 
 const getDayAnswer = (day_) => {
@@ -81,7 +81,17 @@ function Init(){
   // Initialize Firebase
   const fbApp = fbInit(firebaseConfig);
   const fbAnalytics = fbGetAnalytics(fbApp);
-}
+  const auth = getAuth();
+  signInAnonymously(auth)
+    .then(() => {
+      // Signed in..
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // ...
+    });
+  }
 
 function App() {
 
@@ -123,6 +133,7 @@ function App() {
   const [longestStreak, setLongestStreak] = useLocalStorage('longest-streak', 0)
   const streakUpdated = useRef(false)
   const [modalIsOpen, setIsOpen] = useState(false)
+  const [user, setUser] = useState()
 
   const openModal = () => setIsOpen(true)
   const closeModal = () => setIsOpen(false)
@@ -140,6 +151,7 @@ function App() {
   const toggleShareModal = () => {
     openModal()
   }
+
 
   useEffect(() => {
     if (gameState !== state.playing) {
@@ -373,6 +385,22 @@ function App() {
   }
 
   Init();
+  const auth = getAuth();
+  // Triggers on firebase auth change
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      // User is signed in, see docs for a list of available properties
+      // https://firebase.google.com/docs/reference/js/firebase.User
+      const uid = user.uid;
+      console.log('Successfully Authed');
+      console.log(uid)
+      setUser(user)
+    } else {
+      // User is signed out
+      // ...
+    }
+  });
+
 
   var html;
   if (darkMode == true) {
