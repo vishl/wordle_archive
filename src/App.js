@@ -18,21 +18,6 @@ import { getAnalytics as fbGetAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: process.env.FB_APIKEY,
-  authDomain: process.env.FB_AUTHDOMAIN,
-  projectId: process.env.FB_PROJECTID,
-  storageBucket: process.env.FB_STORAGEBUCKET,
-  messagingSenderId: process.env.FB_MESSAGINGSENDERID,
-  appId: process.env.FB_APPID,
-  measurementId: process.env.FB_MEASUREMENTID
-};
-
-// Initialize Firebase
-const fbApp = fbInit(firebaseConfig);
-const fbAnalytics = fbGetAnalytics(fbApp);
 
 const getDayAnswer = (day_) => {
   return wordle_answers[day_-1].toUpperCase()
@@ -79,6 +64,23 @@ setDay(getDay(og_day));
 var items_list = []
 for (var i=1;i<=og_day;i++) {
   items_list.push(i)
+}
+
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_FB_APIKEY,
+  authDomain: process.env.REACT_APP_FB_AUTHDOMAIN,
+  projectId: process.env.REACT_APP_FB_PROJECTID,
+  storageBucket: process.env.REACT_APP_FB_STORAGEBUCKET,
+  messagingSenderId: process.env.REACT_APP_FB_MESSAGINGSENDERID,
+  appId: process.env.REACT_APP_FB_APPID,
+  measurementId: process.env.REACT_APP_FB_MEASUREMENTID
+};
+
+
+function Init(){
+  // Initialize Firebase
+  const fbApp = fbInit(firebaseConfig);
+  const fbAnalytics = fbGetAnalytics(fbApp);
 }
 
 function App() {
@@ -370,24 +372,7 @@ function App() {
     play()
   }
 
-  var tempGameStateList = JSON.parse(localStorage.getItem('gameStateList'))
-  if (tempGameStateList == null) {
-    setGameStateList(gameStateList)
-    tempGameStateList = gameStateList
-  }
-  for (var i=4;i<=og_day+3;i++) {
-    var textNumber = document.getElementById('headlessui-menu-item-'+i)
-    if(textNumber != null) {
-      if (tempGameStateList[i-1] == state.won) {
-        textNumber.classList.add('green-text');
-      }
-      if (tempGameStateList[i-1] == state.lost) {
-        textNumber.classList.add('red-text');
-      }
-    }
-  }
-
-  var header_symbol = (tempGameStateList[day-1] == 'won') ? ('✔') : ((tempGameStateList[day-1] == 'lost') ? ('✘') : '')
+  Init();
 
   var html;
   if (darkMode == true) {
@@ -404,7 +389,7 @@ function App() {
       <div className={`flex flex-col justify-between h-fill bg-background dark:bg-background-dark`}>
         <Header
           day={day}
-          header_symbol={header_symbol}
+          gameStateList={gameStateList}
           toggleDarkMode={toggleDarkMode}
           darkMode={darkMode}
           colorBlindMode={colorBlindMode}
@@ -419,7 +404,7 @@ function App() {
           playLast     = {playLast}
           playFirst    = {playFirst}
           items_list   = {items_list}
-          gameStateList = {tempGameStateList}
+          gameStateList = {gameStateList}
         />
 
         <div className="flex items-center flex-col py-4">

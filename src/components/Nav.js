@@ -1,7 +1,6 @@
 import { Menu } from '@headlessui/react'
 import { classNames, state} from '../constants'
 
-
 export const Nav = ({
   playPrevious,
   playRandom,

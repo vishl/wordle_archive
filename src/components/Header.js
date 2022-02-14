@@ -9,9 +9,10 @@ import { modalStyles, modalStylesDark } from '../styles'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 
 
+
 export const Header = ({
   day,
-  header_symbol,
+  gameStateList,
   darkMode,
   colorBlindMode,
   toggleDarkMode,
@@ -29,6 +30,7 @@ export const Header = ({
     setInfoModalIsOpen(false)
   }
 
+  var header_symbol = (gameStateList[day-1] == 'won') ? ('✔') : ((gameStateList[day-1] == 'lost') ? ('✘') : '')
 
   return (
     <div>
