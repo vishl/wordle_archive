@@ -16,7 +16,7 @@ import { modalStyles, modalStylesDark } from './styles'
 import { initializeApp as fbInit } from "firebase/app";
 import { getAnalytics as fbGetAnalytics } from "firebase/analytics";
 import { getAuth, signInAnonymously, onAuthStateChanged} from "firebase/auth";
-
+import { getDatabase, get, set, ref, child } from "firebase/database";
 
 
 const getDayAnswer = (day_) => {
@@ -58,6 +58,12 @@ const getOGDay = () => {
   return diffDays
 }
 
+const toDate = (day) => {
+  const date1 = new Date('6/21/21')
+  date1 += day * (1000 * 60 * 60 * 24)
+  return date1
+}
+
 var day;
 const og_day = getOGDay() //This is today
 setDay(getDay(og_day));
@@ -73,18 +79,19 @@ const firebaseConfig = {
   storageBucket: process.env.REACT_APP_FB_STORAGEBUCKET,
   messagingSenderId: process.env.REACT_APP_FB_MESSAGINGSENDERID,
   appId: process.env.REACT_APP_FB_APPID,
-  measurementId: process.env.REACT_APP_FB_MEASUREMENTID
+  measurementId: process.env.REACT_APP_FB_MEASUREMENTID,
+  databaseURL: process.env.REACT_APP_FB_DB
 };
 
+let fbApp, fbAnalytics;
 
 function Init(){
   // Initialize Firebase
-  const fbApp = fbInit(firebaseConfig);
-  const fbAnalytics = fbGetAnalytics(fbApp);
+  fbApp = fbInit(firebaseConfig);
+  fbAnalytics = fbGetAnalytics(fbApp);
   const auth = getAuth();
   signInAnonymously(auth)
     .then(() => {
-      // Signed in..
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -133,7 +140,8 @@ function App() {
   const [longestStreak, setLongestStreak] = useLocalStorage('longest-streak', 0)
   const streakUpdated = useRef(false)
   const [modalIsOpen, setIsOpen] = useState(false)
-  const [user, setUser] = useState()
+
+  let _user, _userProfile;
 
   const openModal = () => setIsOpen(true)
   const closeModal = () => setIsOpen(false)
@@ -306,14 +314,15 @@ function App() {
 
   const onGameOver = () => {
     let st = {
-      answer: answer,
-      gameState: gameState,
-      board: board,
-      cellStatuses: cellStatuses,
-      letterStatuses: letterStatuses
+        date:toDate(day),
+        answer: answer,
+        gameState: gameState,
+        board: board,
+        cellStatuses: cellStatuses,
+        letterStatuses: letterStatuses
     }
-    console.log(st);
-    //TODO: actually store it to firebase
+      console.log(st);
+      //TODO: actually store it to firebase
   }
 
 
@@ -392,9 +401,16 @@ function App() {
       // User is signed in, see docs for a list of available properties
       // https://firebase.google.com/docs/reference/js/firebase.User
       const uid = user.uid;
+      const db = getDatabase(fbApp);
       console.log('Successfully Authed');
-      console.log(uid)
-      setUser(user)
+      console.log(uid);
+      _user = user;
+      set(ref(db, `users/${uid}/last_login`), Date.now()); // This will also create the user if necessary
+      get(child(ref(db), `users/${uid}`)).then((snapshot) => {
+        if(snapshot.exists()){
+          _userProfile = snapshot.val();
+        }
+      });
     } else {
       // User is signed out
       // ...
