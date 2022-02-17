@@ -8,7 +8,7 @@ import { EndGameModal } from './components/EndGameModal'
 import { Header } from './components/Header'
 import { Nav } from './components/Nav'
 
-import { Transition } from '@headlessui/react'
+// import { Transition } from '@headlessui/react'
 
 import { modalStyles, modalStylesDark } from './styles'
 
@@ -59,7 +59,7 @@ const getOGDay = () => {
 }
 
 const toDate = (day) => {
-  const date1 = new Date('6/21/21')
+  let date1 = new Date('6/21/21')
   date1 += day * (1000 * 60 * 60 * 24)
   return date1
 }
@@ -94,13 +94,16 @@ function Init(){
     .then(() => {
     })
     .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
+      // const errorCode = error.code;
+      // const errorMessage = error.message;
       // ...
     });
   }
 
+let _user, _userProfile, _db;
+
 function App() {
+  console.log('Run');
 
   const reloadCount = Number(sessionStorage.getItem('reloadCount')) || 0;
 
@@ -141,7 +144,6 @@ function App() {
   const streakUpdated = useRef(false)
   const [modalIsOpen, setIsOpen] = useState(false)
 
-  let _user, _userProfile;
 
   const openModal = () => setIsOpen(true)
   const closeModal = () => setIsOpen(false)
@@ -314,6 +316,7 @@ function App() {
 
   const onGameOver = () => {
     let st = {
+        gameIndex: day,
         date:toDate(day),
         answer: answer,
         gameState: gameState,
@@ -321,8 +324,19 @@ function App() {
         cellStatuses: cellStatuses,
         letterStatuses: letterStatuses
     }
-      console.log(st);
-      //TODO: actually store it to firebase
+    console.log(st);
+    // add the game to the profile only if it doesn't exist
+    if(!_userProfile.games?.[day]){
+      //TODO: update streak as well
+      set(ref(_db, `users/${_user.uid}/games/${day}`), st)
+        .then( () => {
+          //add it locally as well
+          if(!_userProfile.games){
+            _userProfile.games = {}
+          }
+          _userProfile.games[day] = st;
+        });
+    }
   }
 
 
@@ -340,13 +354,13 @@ function App() {
 
     if (lastFilledRow && isRowAllGreen(lastFilledRow)) {
       setGameState(state.won)
-      var newGameStateList = JSON.parse(localStorage.getItem('gameStateList'))
+      let newGameStateList = JSON.parse(localStorage.getItem('gameStateList'))
       newGameStateList[day-1] = state.won
       localStorage.setItem('gameStateList', JSON.stringify(newGameStateList))
       onGameOver();
     } else if (currentRow === 6) {
       setGameState(state.lost)
-      var newGameStateList = JSON.parse(localStorage.getItem('gameStateList'))
+      let newGameStateList = JSON.parse(localStorage.getItem('gameStateList'))
       newGameStateList[day-1] = state.lost
       localStorage.setItem('gameStateList', JSON.stringify(newGameStateList))
       onGameOver();
@@ -398,19 +412,26 @@ function App() {
   // Triggers on firebase auth change
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/firebase.User
-      const uid = user.uid;
-      const db = getDatabase(fbApp);
-      console.log('Successfully Authed');
-      console.log(uid);
-      _user = user;
-      set(ref(db, `users/${uid}/last_login`), Date.now()); // This will also create the user if necessary
-      get(child(ref(db), `users/${uid}`)).then((snapshot) => {
-        if(snapshot.exists()){
-          _userProfile = snapshot.val();
-        }
-      });
+      if(!_user){
+        // User is signed in for the first time
+        console.log('Successfully Authed');
+        console.log(user.uid);
+        const uid = user.uid;
+        _db = getDatabase(fbApp);
+        _user = user;
+        // This will also create the user if necessary
+        set(ref(_db, `users/${uid}/last_login`), Date.now());
+        // Get profile if it exists
+        get(child(ref(_db), `users/${uid}`)).then((snapshot) => {
+          if(snapshot.exists()){
+            _userProfile = snapshot.val();
+          } else {
+            _userProfile = {
+              games:{}
+            }
+          }
+        });
+      }
     } else {
       // User is signed out
       // ...
@@ -419,7 +440,7 @@ function App() {
 
 
   var html;
-  if (darkMode == true) {
+  if (darkMode === true) {
     html = document.getElementsByTagName( 'html' )[0]; // '0' to assign the first (and only `HTML` tag)
     html.setAttribute( 'class', 'dark-bg' );
   }
