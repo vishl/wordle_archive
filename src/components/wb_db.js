@@ -65,6 +65,7 @@ export class wbDb {
     if(typeof name !== 'string'){
       throw new Error('Name is not a string');
     }
+    this._userProfile.name = name;  // this is ugly, but not sure how to avoid without unecessary fetches
     return set(ref(this._db, `${this._userPath()}/name`), name);
   }
 

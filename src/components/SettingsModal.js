@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form'
 
 Modal.setAppElement('#root')
 
-
 export const SettingsModal = ({
   isOpen,
   handleClose,
@@ -20,17 +19,34 @@ export const SettingsModal = ({
 
   function updateName(data){
     console.log(data);
+    if(data.name){
+      // remove special chars
+      let cleanName = data.name.replace(/[!@#$%^&*()_+\-=\[\]{};':"\\|,<>\/?]/ig,'').substring(0,20);
+      console.log(`Clean name: ${cleanName}`);
+      // 20 chars max
+      name = cleanName;
+      db.setName(cleanName);
+    }
   }
 
-  const {register, handleSubmit} = useForm({mode: 'onBlur'});
-  const [name, setName] = useState(db?.getUserProfile()?.name);
 
-  //if name changes, write it back to the server
-  useEffect( () => {
-    if(name){
-      db.setName(name);
-    }
-  }, [name])
+  let name = db?.getUserProfile()?.name
+
+  console.log(`Rendering settings with db=${db}, name=${name}`);
+
+  const {register, handleSubmit, setValue, formState: { errors }} = useForm({
+    mode: 'onBlur',
+    // defaultValues: {name: name}
+  });
+
+  //this is the worlds ugliest hack, i hate this whole framework so much
+  if(name && !errors.name){
+    setValue('name', name);
+  }
+
+  if(errors.name){
+    console.log(errors);
+  }
 
   return (
     <Modal
@@ -103,20 +119,29 @@ export const SettingsModal = ({
               onBlur={handleSubmit(updateName)}
               onSubmit={handleSubmit(updateName)}
             >
-              <div className="sm:flex sm:items-center mb-6">
-                <div className="sm:w-1/3">
-                  <label className="block sm:text-right mb-1 sm:mb-0 pr-4" htmlFor="inline-full-name">
+              <div className="flex items-center">
+                <div className="w-1/3">
+                  <label className="block text-right mb-1 mb-0 pr-4" htmlFor="inline-full-name">
                     Name
                   </label>
                 </div>
-                <div className="sm:w-2/3">
-                  <input className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
+                <div className="w-2/3">
+                  <input className="appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
                     type="text"
-                    {...register('name')}
+                    {...register('name', {value: name, maxLength:20, pattern:/^[\w]+$/})}
                     id="name"
                     aria-label="Name"
                     placeholder="Name"
                   />
+                </div>
+              </div>
+              <div className="flex items-center mb-6">
+                <div className="w-1/3">
+                </div>
+
+                <div className="w-2/3 mb-6 h-10 text-red-500">
+                    {errors.name?.type === 'pattern' && 'Invalid characters...'}
+                    {errors.name?.type === 'maxLength' && 'Too long...'}
                 </div>
               </div>
             </form>
