@@ -36,7 +36,13 @@ const Keyboard = ({ letterStatuses, addLetter, onEnterPress, onDeletePress, game
 
   const handleKeyDown = useCallback(
     (event) => {
-      if (gameDisabled) return
+      if (gameDisabled){
+        return;
+      }
+      // If we're entering form data don't capture the keypress
+      if (document.activeElement.tagName === 'INPUT'){
+        return;
+      }
 
       const letter = event.key.toUpperCase()
 

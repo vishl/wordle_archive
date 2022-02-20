@@ -17,7 +17,8 @@ export const Header = ({
   colorBlindMode,
   toggleDarkMode,
   toggleColorBlindMode,
-  toggleShareModal
+  toggleShareModal,
+  db
 }) => {
 
   const [settingsModalIsOpen, setSettingsModalIsOpen] = useState(false)
@@ -56,6 +57,7 @@ export const Header = ({
           toggleDarkMode={toggleDarkMode}
           colorBlindMode={colorBlindMode}
           toggleColorBlindMode={toggleColorBlindMode}
+          db={db}
         />
         <InfoModal
           isOpen={infoModalIsOpen}

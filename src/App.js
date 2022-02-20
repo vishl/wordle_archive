@@ -12,11 +12,7 @@ import { Nav } from './components/Nav'
 
 import { modalStyles, modalStylesDark } from './styles'
 
-// Import the functions you need from the SDKs you need
-import { initializeApp as fbInit } from "firebase/app";
-import { getAnalytics as fbGetAnalytics } from "firebase/analytics";
-import { getAuth, signInAnonymously, onAuthStateChanged} from "firebase/auth";
-import { getDatabase, get, set, ref, child } from "firebase/database";
+import { wbDb } from './components/wb_db'
 
 
 const getDayAnswer = (day_) => {
@@ -83,24 +79,30 @@ const firebaseConfig = {
   databaseURL: process.env.REACT_APP_FB_DB
 };
 
-let fbApp, fbAnalytics;
+let db;
 
 function Init(){
-  // Initialize Firebase
-  fbApp = fbInit(firebaseConfig);
-  fbAnalytics = fbGetAnalytics(fbApp);
-  const auth = getAuth();
-  signInAnonymously(auth)
-    .then(() => {
-    })
-    .catch((error) => {
-      // const errorCode = error.code;
-      // const errorMessage = error.message;
-      // ...
-    });
+  // Only init once, this whole thing is written in a stupid way
+  if(db){
+    return;
   }
 
-let _user, _userProfile, _db;
+  // Initialize Firebase
+  db = new wbDb(firebaseConfig);
+  db.signIn();
+
+  // fbApp = fbInit(firebaseConfig);
+  // fbAnalytics = fbGetAnalytics(fbApp);
+  // const auth = getAuth();
+  // signInAnonymously(auth)
+  //   .then(() => {
+  //   })
+  //   .catch((error) => {
+  //     // const errorCode = error.code;
+  //     // const errorMessage = error.message;
+  //     // ...
+  //   });
+}
 
 function App() {
   console.log('Run');
@@ -325,18 +327,8 @@ function App() {
         letterStatuses: letterStatuses
     }
     console.log(st);
-    // add the game to the profile only if it doesn't exist
-    if(!_userProfile.games?.[day]){
-      //TODO: update streak as well
-      set(ref(_db, `users/${_user.uid}/games/${day}`), st)
-        .then( () => {
-          //add it locally as well
-          if(!_userProfile.games){
-            _userProfile.games = {}
-          }
-          _userProfile.games[day] = st;
-        });
-    }
+    db.logGame(st);
+
   }
 
 
@@ -408,35 +400,6 @@ function App() {
   }
 
   Init();
-  const auth = getAuth();
-  // Triggers on firebase auth change
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      if(!_user){
-        // User is signed in for the first time
-        console.log('Successfully Authed');
-        console.log(user.uid);
-        const uid = user.uid;
-        _db = getDatabase(fbApp);
-        _user = user;
-        // This will also create the user if necessary
-        set(ref(_db, `users/${uid}/last_login`), Date.now());
-        // Get profile if it exists
-        get(child(ref(_db), `users/${uid}`)).then((snapshot) => {
-          if(snapshot.exists()){
-            _userProfile = snapshot.val();
-          } else {
-            _userProfile = {
-              games:{}
-            }
-          }
-        });
-      }
-    } else {
-      // User is signed out
-      // ...
-    }
-  });
 
 
   var html;
@@ -460,6 +423,7 @@ function App() {
           colorBlindMode={colorBlindMode}
           toggleColorBlindMode={toggleColorBlindMode}
           toggleShareModal={toggleShareModal}
+          db={db}
         />
 
         <Nav
