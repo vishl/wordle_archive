@@ -90,18 +90,6 @@ function Init(){
   // Initialize Firebase
   db = new wbDb(firebaseConfig);
   db.signIn();
-
-  // fbApp = fbInit(firebaseConfig);
-  // fbAnalytics = fbGetAnalytics(fbApp);
-  // const auth = getAuth();
-  // signInAnonymously(auth)
-  //   .then(() => {
-  //   })
-  //   .catch((error) => {
-  //     // const errorCode = error.code;
-  //     // const errorMessage = error.message;
-  //     // ...
-  //   });
 }
 
 function App() {
@@ -324,8 +312,11 @@ function App() {
         gameState: gameState,
         board: board,
         cellStatuses: cellStatuses,
-        letterStatuses: letterStatuses
+        letterStatuses: letterStatuses,
+        timestamp: Date.now()
+
     }
+    console.log('Logging Game');
     console.log(st);
     db.logGame(st);
 
@@ -349,15 +340,20 @@ function App() {
       let newGameStateList = JSON.parse(localStorage.getItem('gameStateList'))
       newGameStateList[day-1] = state.won
       localStorage.setItem('gameStateList', JSON.stringify(newGameStateList))
-      onGameOver();
     } else if (currentRow === 6) {
       setGameState(state.lost)
       let newGameStateList = JSON.parse(localStorage.getItem('gameStateList'))
       newGameStateList[day-1] = state.lost
       localStorage.setItem('gameStateList', JSON.stringify(newGameStateList))
-      onGameOver();
     }
   }, [cellStatuses, currentRow])
+
+  // If game state is updated to won/lost then call ongameover
+  useEffect( () => {
+    if(gameState === state.won || gameState === state.lost){
+      onGameOver();
+    }
+  }, [gameState]);
 
   const updateLetterStatuses = (word) => {
     setLetterStatuses((prev) => {

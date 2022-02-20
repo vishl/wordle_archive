@@ -34,6 +34,10 @@ export class wbDb {
     return `users/${this._user?.uid}`
   }
 
+  _gamesPath(day){
+    return `${this._userPath()}/games/${day}`;
+  }
+
   _setLastLogin(){
     return set(ref(this._db, `${this._userPath()}/last_login`), Date.now());
   }
@@ -50,7 +54,6 @@ export class wbDb {
       }
     });
   }
-
 
   // Public methods
   getUserProfile(){
@@ -88,15 +91,20 @@ export class wbDb {
     const day = st.gameIndex;
     // add the game to the profile only if it doesn't exist
     if(!this._userProfile.games?.[day]){
+      console.log(`Logging game ${day}`);
+      console.log(st);
       //TODO: update streak as well
-      set(ref(this._db, `users/${this._user.uid}/games/${day}`), st)
+      set(ref(this._db, this._gamesPath(day)), st)
         .then( () => {
+
           //add it locally as well
           if(!this._userProfile.games){
             this._userProfile.games = {}
           }
           this._userProfile.games[day] = st;
         });
+    }else{
+      console.log(`Not logging game ${day} because it exists`);
     }
   }
 
