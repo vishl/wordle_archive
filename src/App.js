@@ -21,30 +21,52 @@ const getDayAnswer = (day_) => {
 
 // Set the day number of the puzzle to display and show it as the address bar query string
 
+class wbUrlHandler {
+  constructor(){
+    this._location = document.location;
+  }
+
+  getGameFromURL(){
+    let p = this._location.pathname;
+    let m = p.match(/\/u\/(\d+)/)
+    let index = parseInt(m[1])
+    if(!isNaN(index)){
+      return index;
+    }
+    return null;
+  }
+
+  getFriendFromURL(){
+    //TODO
+  }
+
+  getInitialFriend(){
+    return this._friend;
+  }
+
+  getInitialGame(){
+    let urlGame = this.getGameFromURL();
+    if(urlGame){
+      this._game = urlGame;
+    } else {
+      this._game = getOGDay(); // today's game if no url
+    }
+    return this._game
+  }
+
+  setGame(game){
+    //TODO set url to /g/${game}
+  }
+}
+
+const urlHandler = new wbUrlHandler();
+
+
 const setDay = newDay => {
   if (newDay < 1 || newDay > og_day) return;
   day = newDay;
-  window.history.pushState({}, '', '?' + day);
+  urlHandler.setGame(day);
 };
-
-const getDay = (og_day) => {
-  const { search } = document.location;
-  var url_day = og_day
-  if (search) {
-    if (isNaN(search.slice(1))) {
-      url_day = og_day
-    } else {
-      url_day = parseInt(search.slice(1), 10);
-    }
-    if (url_day > og_day || url_day < 1) {
-      url_day = og_day
-    }
-    return url_day
-  }
-  else {
-    return og_day
-  }
-}
 
 const getOGDay = () => {
   const today = new Date()
@@ -62,7 +84,7 @@ const toDate = (day) => {
 
 var day;
 const og_day = getOGDay() //This is today
-setDay(getDay(og_day));
+setDay(urlHandler.getInitialGame());
 var items_list = []
 for (var i=1;i<=og_day;i++) {
   items_list.push(i)
