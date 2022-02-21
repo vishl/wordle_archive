@@ -14,6 +14,8 @@ import { modalStyles, modalStylesDark } from './styles'
 
 import { wbDb } from './components/wb_db'
 
+const qs = require('query-string');
+
 
 const getDayAnswer = (day_) => {
   return wordle_answers[day_-1].toUpperCase()
@@ -37,10 +39,21 @@ class wbUrlHandler {
   }
 
   getFriendFromURL(){
-    //TODO
+    let s = this._location.search;
+    if(!s){return}
+
+    let obj = qs.parse(s);
+    let id = obj.f
+    if(id.match(/^\w+$/)){
+      console.log(`Got friend ${id}`);
+      return id
+    }else{
+      console.log(`Invalid Friend ${s}`);
+    }
   }
 
   getInitialFriend(){
+    this._friend = this.getFriendFromURL();
     return this._friend;
   }
 
@@ -60,6 +73,7 @@ class wbUrlHandler {
 }
 
 const urlHandler = new wbUrlHandler();
+let friend = urlHandler.getInitialFriend();
 
 
 const setDay = newDay => {
