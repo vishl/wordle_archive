@@ -21,7 +21,7 @@ export const AddFriendModal = ({
         <div>
           Error adding friend {friendId}
           <br />
-          {friendData.error}
+          {friendData.error.toString()}
         </div>
       )
     } else {
@@ -40,8 +40,8 @@ export const AddFriendModal = ({
     )
   }
 
-  // Only do this once
-  if(!friendData){
+  // Only do this once and only when model is open which signifies that the db is initialized
+  if(isOpen && !friendData){
     db.addFriendWithId(friendId).then( friend => {
       setFriendData(friend);
     });

@@ -119,18 +119,28 @@ const firebaseConfig = {
 
 let db;
 
-function Init(){
-  // Only init once, this whole thing is written in a stupid way
-  if(db){
-    return;
-  }
-
-  // Initialize Firebase
-  db = new wbDb(firebaseConfig);
-  db.signIn();
-}
 
 function App() {
+  function Init(){
+    // Only init once, this whole thing is written in a stupid way
+    if(db){
+      return;
+    }
+
+    // Initialize Firebase
+    db = new wbDb(firebaseConfig, { authCallBack: onAuth });
+    db.signIn();
+  }
+
+  function onAuth(profile){
+    if(profile){
+      setIsAuthed(1);
+    }else {
+      setIsAuthed(-1); //Error
+    }
+  }
+
+
   console.log('Run');
 
   const reloadCount = Number(sessionStorage.getItem('reloadCount')) || 0;
@@ -171,7 +181,8 @@ function App() {
   const [longestStreak, setLongestStreak] = useLocalStorage('longest-streak', 0);
   const streakUpdated = useRef(false);
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [addFriendModalIsOpen, setAddFriendModalIsOpen] = useState(friend != null);
+  const [addFriendModalIsOpen, setAddFriendModalIsOpen] = useState(false);
+  const [isAuthed, setIsAuthed] = useState(false);
   //TODO: until we have auth we shouldn't let them start the game
   //TODO: If there is an initial friend then we should acknowledge that on startup and then reset
   //the url
@@ -198,6 +209,15 @@ function App() {
     openModal()
   }
 
+  useEffect(() => {
+    if(isAuthed){
+      console.log('Got Auth');
+      if(friend) {
+        console.log('Opening friend modal');
+        setAddFriendModalIsOpen(true);
+      }
+    }
+  }, [isAuthed]);
 
   useEffect(() => {
     if (gameState !== state.playing) {

@@ -7,7 +7,7 @@ import { getDatabase, get, set, ref, child } from "firebase/database";
 
 
 export class wbDb {
-  constructor(fbConfig, ){
+  constructor(fbConfig, options){
     // Private Members
     this._fbApp = fbInit(fbConfig);
     this._fbAnalytics = fbGetAnalytics(this._fbApp);
@@ -15,6 +15,7 @@ export class wbDb {
     this._db = getDatabase(this._fbApp);
     this._userProfile = null;
     this._user = null;
+    this._authCallback = options.authCallBack;
 
     // Public Members
 
@@ -26,7 +27,7 @@ export class wbDb {
   _init(){
     // Register auth state changed callback
     onAuthStateChanged(this._auth, (user) => {
-      this.onAuth(user);
+      this._onAuth(user);
     });
   }
 
@@ -54,7 +55,7 @@ export class wbDb {
   }
 
   _initUserProfile(){
-    this._getUser().then(data => {
+    return this._getUser().then(data => {
       if(data){
         this._userProfile = data;
       } else {
@@ -63,8 +64,41 @@ export class wbDb {
           games:{}
         }
       }
+
+      return this._userProfile;
     });
   }
+
+  _updateUserProfile(element, data){
+    let path = `${this._userPath()}/${element}`
+    return set(ref(this._db, path), data);
+  }
+
+  _onAuth(user){
+  // Triggers on firebase auth change
+    if (user) {
+      if(!this._user){
+        // User is signed in for the first time
+        console.log('Successfully Authed');
+        console.log(user.uid);
+
+        this._user = user;
+
+        // Set last login time This will also create the user if necessary
+        this._setLastLogin();
+
+        // Get profile if it exists
+        return this._initUserProfile()
+          .then(() => {
+            this._authCallback?.(this._userProfile);
+            return this._userProfile;
+          });
+      }
+    } else {
+      // User is signed out
+    }
+  }
+
 
   // Public methods
   getUserProfile(){
@@ -120,28 +154,8 @@ export class wbDb {
     }
   }
 
-  onAuth(user){
-  // Triggers on firebase auth change
-    if (user) {
-      if(!this._user){
-        // User is signed in for the first time
-        console.log('Successfully Authed');
-        console.log(user.uid);
-
-        this._user = user;
-
-        // Set last login time This will also create the user if necessary
-        this._setLastLogin();
-
-        // Get profile if it exists
-        this._initUserProfile();
-      }
-    } else {
-      // User is signed out
-    }
-  }
-
   addFriendWithId(id){
+    if(!this._userProfile) return Promise.resolve({ error: 'User is not initialized' });
     // Look up friend
     return this._getUser(id)
       .then( data => {
@@ -153,6 +167,16 @@ export class wbDb {
           return { error: 'Could not find friend' }
         }
         return data;
+      }).then( data => {
+        if(data.error) return data;
+        if(this._userProfile.friends?.[id]) return data; //Already friends
+        return this._updateUserProfile(`friends/${id}`, Date.now())
+          .then( d => {
+            return data;
+          })
+          .catch( e => {
+            return { error: e }
+          });
       })
       .catch( e => {
         console.log(e);
