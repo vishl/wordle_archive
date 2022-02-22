@@ -5,6 +5,7 @@ import words from './data/words'
 
 import { useLocalStorage } from './hooks/useLocalStorage'
 import { EndGameModal } from './components/EndGameModal'
+import { AddFriendModal } from './components/AddFriendModal'
 import { Header } from './components/Header'
 import { Nav } from './components/Nav'
 
@@ -73,7 +74,7 @@ class wbUrlHandler {
 }
 
 const urlHandler = new wbUrlHandler();
-let friend = urlHandler.getInitialFriend();
+const friend = urlHandler.getInitialFriend();
 
 
 const setDay = newDay => {
@@ -156,23 +157,31 @@ function App() {
     },
   }
 
-  const [answer, setAnswer] = useState(initialStates.answer)
-  const [gameState, setGameState] = useState(initialStates.gameState)
-  const [gameStateList, setGameStateList] = useLocalStorage('gameStateList', Array(500).fill(initialStates.gameState))
-  const [board, setBoard] = useState(initialStates.board)
-  const [cellStatuses, setCellStatuses] = useState(initialStates.cellStatuses)
-  const [currentRow, setCurrentRow] = useState(initialStates.currentRow)
-  const [currentCol, setCurrentCol] = useState(initialStates.currentCol)
-  const [letterStatuses, setLetterStatuses] = useState(initialStates.letterStatuses)
-  const [submittedInvalidWord, setSubmittedInvalidWord] = useState(false)
-  const [currentStreak, setCurrentStreak] = useLocalStorage('current-streak', 0)
-  const [longestStreak, setLongestStreak] = useLocalStorage('longest-streak', 0)
-  const streakUpdated = useRef(false)
-  const [modalIsOpen, setIsOpen] = useState(false)
+  const [answer, setAnswer] = useState(initialStates.answer);
+  const [gameState, setGameState] = useState(initialStates.gameState);
+  const [gameStateList, setGameStateList] = useLocalStorage('gameStateList', Array(500).fill(initialStates.gameState));
+  const [board, setBoard] = useState(initialStates.board);
+  const [cellStatuses, setCellStatuses] = useState(initialStates.cellStatuses);
+  const [currentRow, setCurrentRow] = useState(initialStates.currentRow);
+  const [currentCol, setCurrentCol] = useState(initialStates.currentCol);
+  const [letterStatuses, setLetterStatuses] = useState(initialStates.letterStatuses);
+  const [submittedInvalidWord, setSubmittedInvalidWord] = useState(false);
+  const [currentStreak, setCurrentStreak] = useLocalStorage('current-streak', 0);
+  const [longestStreak, setLongestStreak] = useLocalStorage('longest-streak', 0);
+  const streakUpdated = useRef(false);
+  const [modalIsOpen, setIsOpen] = useState(false);
+  const [addFriendModalIsOpen, setAddFriendModalIsOpen] = useState(friend != null);
+  //TODO: until we have auth we shouldn't let them start the game
+  //TODO: If there is an initial friend then we should acknowledge that on startup and then reset
+  //the url
 
 
+  // Modal Handlers
   const openModal = () => setIsOpen(true)
   const closeModal = () => setIsOpen(false)
+  function addFriendModalShouldClose(){
+    setAddFriendModalIsOpen(false);
+  }
 
   const [darkMode, setDarkMode] = useLocalStorage('dark-mode', false)
   const toggleDarkMode = () => {
@@ -486,6 +495,14 @@ function App() {
             )}
           </div>
         </div>
+        <AddFriendModal
+          isOpen={addFriendModalIsOpen}
+          handleClose={addFriendModalShouldClose}
+          darkMode={darkMode}
+          styles={ darkMode ? modalStylesDark : modalStyles}
+          friendId={friend}
+          db={db}
+        />
         <EndGameModal
           isOpen={modalIsOpen}
           handleClose={closeModal}

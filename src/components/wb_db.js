@@ -30,8 +30,8 @@ export class wbDb {
     });
   }
 
-  _userPath(){
-    return `users/${this._user?.uid}`
+  _userPath(id = this._user?.uid){
+    return `users/${id}`
   }
 
   _gamesPath(day){
@@ -42,10 +42,21 @@ export class wbDb {
     return set(ref(this._db, `${this._userPath()}/last_login`), Date.now());
   }
 
+  _getUser(id = this._user?.uid){
+    return get(child(ref(this._db), this._userPath(id)))
+      .then( snapshot => {
+        if(snapshot.exists()){
+          return snapshot.val();
+        } else {
+          return null;
+        }
+      });
+  }
+
   _initUserProfile(){
-    get(child(ref(this._db), this._userPath())).then((snapshot) => {
-      if(snapshot.exists()){
-        this._userProfile = snapshot.val();
+    this._getUser().then(data => {
+      if(data){
+        this._userProfile = data;
       } else {
         // default profile for new user
         this._userProfile = {
@@ -128,6 +139,26 @@ export class wbDb {
     } else {
       // User is signed out
     }
+  }
+
+  addFriendWithId(id){
+    // Look up friend
+    return this._getUser(id)
+      .then( data => {
+        console.log(`Got data for user ${id}`);
+        console.log(data);
+        // If exists add id to current user
+        // Yield data
+        if(!data){
+          return { error: 'Could not find friend' }
+        }
+        return data;
+      })
+      .catch( e => {
+        console.log(e);
+        return { error: e };
+      });
+
   }
 
 }
