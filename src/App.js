@@ -31,12 +31,13 @@ class wbUrlHandler {
 
   getGameFromURL(){
     let p = this._location.pathname;
-    let m = p.match(/\/u\/(\d+)/)
+    if(!p) return null;
+    let m = p.match(/\/g\/(\d+)/)
+    if(!m) return null;
     let index = parseInt(m[1])
-    if(!isNaN(index)){
-      return index;
-    }
-    return null;
+    if(isNaN(index)) return null;
+
+    return index;
   }
 
   getFriendFromURL(){
