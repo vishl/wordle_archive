@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ReactComponent as Close } from '../data/Close.svg'
 import Modal from 'react-modal'
+import { FriendSummary } from './FriendDisplay'
 
 Modal.setAppElement('#root')
 
@@ -25,14 +26,17 @@ export const AddFriendModal = ({
         </div>
       )
     } else {
+      // Success
       inside = (
         <div>
           Added friend '{friendData.name}'
+          <FriendSummary friendData={friendData} />
         </div>
       )
+      // TODO: populate friend data
     }
-    // TODO: populate friend data
   } else {
+    // Loading
     inside = (
       <div>
         Adding Friend {friendId}

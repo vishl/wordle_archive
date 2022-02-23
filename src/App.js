@@ -8,6 +8,7 @@ import { EndGameModal } from './components/EndGameModal'
 import { AddFriendModal } from './components/AddFriendModal'
 import { Header } from './components/Header'
 import { Nav } from './components/Nav'
+import Board from './components/Board'
 
 // import { Transition } from '@headlessui/react'
 
@@ -498,24 +499,14 @@ function App() {
           gameStateList = {gameStateList}
         />
 
-        <div className="flex items-center flex-col py-4">
-          <div className="grid grid-cols-5 grid-flow-row gap-4">
-            {board.map((row, rowNumber) =>
-              row.map((letter, colNumber) => (
-                <span
-                  key={colNumber}
-                  className={`${getCellStyles(
-                    rowNumber,
-                    colNumber,
-                    letter
-                  )} inline-flex items-center font-medium justify-center text-xl w-[14vw] h-[14vw] xs:w-14 xs:h-14 sm:w-20 sm:h-20 rounded`}
-                >
-                  {letter}
-                </span>
-              ))
-            )}
-          </div>
-        </div>
+        <Board
+          colorBlindMode={colorBlindMode}
+          board={board}
+          cellStatuses={cellStatuses}
+          currentRow={currentRow}
+          submittedInvalidWord={submittedInvalidWord}
+        />
+
         <AddFriendModal
           isOpen={addFriendModalIsOpen}
           handleClose={addFriendModalShouldClose}
