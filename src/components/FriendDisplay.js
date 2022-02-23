@@ -1,3 +1,4 @@
+import Board from './Board'
 
 // Display overall stats
 export function FriendSummary({friendData}) {
@@ -12,24 +13,27 @@ export function FriendSummary({friendData}) {
   );
 }
 
-export function FriendGame({friendData, userData, gameId}){
-  if(!friendData || !userData || !gameId){
+export function FriendGame({ friendData, userData, colorBlindMode}){
+  if(!friendData || !userData ){
     return (<div>Invalid Data</div>)
   }
 
-  let f = friendData.game[gameId];
-  if(!f){
+  if(!friendData){
     //friend has not played the game
     return <div />
   }
 
-  let u = userData.game[gameId];
   // if user hasn't played the game don't display the answer, just the colors
-  let showLetters = !!u;
+  let colorsOnly = !userData;
 
   return (
-    //render a board here TODO
-    <div />
+    <Board
+      colorBlindMode={false}
+      board={friendData.board}
+      cellStatuses={friendData.cellStatuses}
+      colorsOnly={colorsOnly}
+      mode='small'
+    />
 
   )
 

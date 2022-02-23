@@ -6,38 +6,52 @@ export default function Board({
   board,
   cellStatuses,
   currentRow,
-  submittedInvalidWord
+  submittedInvalidWord,
+  colorsOnly,
+  mode
 }){
-  function getCellStyles(rowNumber, colNumber, letter) {
+  function getCellStyles(rowNumber, colNumber, letter, mode) {
+    let s = ""
     if (rowNumber === currentRow) {
       if (letter) {
-        return `nm-inset-background dark:nm-inset-background-dark text-primary dark:text-primary-dark ${
+        s += `nm-inset-background dark:nm-inset-background-dark text-primary dark:text-primary-dark ${
             submittedInvalidWord ? 'border border-red-800' : ''
-          }`
+          }`;
+      }else{
+        s += 'nm-flat-background dark:nm-flat-background-dark text-primary dark:text-primary-dark';
       }
-      return 'nm-flat-background dark:nm-flat-background-dark text-primary dark:text-primary-dark'
     }
 
     switch (cellStatuses[rowNumber][colNumber]) {
       case status.green:
         if (colorBlindMode) {
-          return 'nm-inset-orange-500 text-gray-50'
+          s += 'nm-inset-orange-500 text-gray-50';
         }
         else {
-          return 'nm-inset-n-green text-gray-50'
+          s += 'nm-inset-n-green text-gray-50';
         }
+        break;
       case status.yellow:
         if (colorBlindMode) {
-          return 'nm-inset-blue-300 text-gray-50'
+          s += 'nm-inset-blue-300 text-gray-50';
         }
         else {
-          return 'nm-inset-yellow-500 text-gray-50'
+          s += 'nm-inset-yellow-500 text-gray-50';
         }
+        break;
       case status.gray:
-        return 'nm-inset-n-gray text-gray-50'
+        s += 'nm-inset-n-gray text-gray-50';
+        break;
       default:
-        return 'nm-flat-background dark:nm-flat-background-dark text-primary dark:text-primary-dark'
+        s += 'nm-flat-background dark:nm-flat-background-dark text-primary dark:text-primary-dark';
     }
+
+    if(mode === 'small'){
+      s += ' inline-flex items-center font-medium justify-center text-xl w-[7vw] h-[7vw] xs:w-7 xs:h-7 sm:w-7 sm:h-7 rounded';
+    }else{
+      s += ' inline-flex items-center font-medium justify-center text-xl w-[14vw] h-[14vw] xs:w-14 xs:h-14 sm:w-20 sm:h-20 rounded';
+    }
+    return s;
   }
 
 
@@ -45,7 +59,7 @@ export default function Board({
 
   return (
     <div className="flex items-center flex-col py-4">
-      <div className="grid grid-cols-5 grid-flow-row gap-4">
+      <div className={`grid grid-cols-5 grid-flow-row ${mode==='small' ? "gap-2" : "gap-4"}`}>
         {board.map((row, rowNumber) =>
           row.map((letter, colNumber) => (
             <span
@@ -53,8 +67,9 @@ export default function Board({
               className={`${getCellStyles(
                 rowNumber,
                 colNumber,
-                letter
-              )} inline-flex items-center font-medium justify-center text-xl w-[14vw] h-[14vw] xs:w-14 xs:h-14 sm:w-20 sm:h-20 rounded`}
+                letter,
+                mode
+              )}`}
             >
               {letter}
             </span>

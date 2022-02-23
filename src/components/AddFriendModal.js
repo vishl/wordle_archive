@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ReactComponent as Close } from '../data/Close.svg'
 import Modal from 'react-modal'
-import { FriendSummary } from './FriendDisplay'
+import { FriendSummary, FriendGame } from './FriendDisplay'
 
 Modal.setAppElement('#root')
 
@@ -31,6 +31,13 @@ export const AddFriendModal = ({
         <div>
           Added friend '{friendData.name}'
           <FriendSummary friendData={friendData} />
+          {Object.values(friendData.games).map((game) =>
+            <FriendGame
+              friendData={game}
+              userData={db.getUserProfile().games[game.gameIndex]}
+              key={game.gameIndex}
+            />
+          )}
         </div>
       )
       // TODO: populate friend data
