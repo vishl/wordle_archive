@@ -184,9 +184,6 @@ function App() {
   const [modalIsOpen, setIsOpen] = useState(false);
   const [addFriendModalIsOpen, setAddFriendModalIsOpen] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
-  //TODO: until we have auth we shouldn't let them start the game
-  //TODO: If there is an initial friend then we should acknowledge that on startup and then reset
-  //the url
 
 
   // Modal Handlers
@@ -454,6 +451,7 @@ function App() {
           colorBlindMode={colorBlindMode}
           toggleColorBlindMode={toggleColorBlindMode}
           toggleShareModal={toggleShareModal}
+          isAuthed={isAuthed}
           db={db}
         />
 

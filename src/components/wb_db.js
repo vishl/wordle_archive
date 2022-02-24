@@ -99,11 +99,22 @@ export class wbDb {
     }
   }
 
+  _fetchFriends(){
+  }
+
 
   // Public methods
   getUserProfile(){
     //TODO: should return a deep copy or something here to prevent mutation
     return this._userProfile;
+  }
+
+  fetchFriends(){
+    if(this._friends){
+      return Promise.resolve(this._friends);
+    }
+
+    return this._fetchFriends();
   }
 
   setName(name){

@@ -5,6 +5,7 @@ import { ReactComponent as Share } from '../data/Share.svg'
 import { ReactComponent as Info } from '../data/Info.svg'
 import { InfoModal } from './InfoModal'
 import { SettingsModal } from './SettingsModal'
+import { FriendsModal } from './FriendsModal'
 import { modalStyles, modalStylesDark } from '../styles'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 
@@ -18,10 +19,12 @@ export const Header = ({
   toggleDarkMode,
   toggleColorBlindMode,
   toggleShareModal,
+  isAuthed,
   db
 }) => {
 
   const [settingsModalIsOpen, setSettingsModalIsOpen] = useState(false)
+  const [friendModalIsOpen, setFriendsModalIsOpen] = useState(false)
   const [firstTime, setFirstTime] = useLocalStorage('first-time', true)
   const [infoModalIsOpen, setInfoModalIsOpen] = useState(firstTime)
 
@@ -31,7 +34,16 @@ export const Header = ({
     setInfoModalIsOpen(false)
   }
 
-  var header_symbol = (gameStateList[day-1] == 'won') ? ('✔') : ((gameStateList[day-1] == 'lost') ? ('✘') : '')
+  let header_symbol = (gameStateList[day-1] == 'won') ? ('✔') : ((gameStateList[day-1] == 'lost') ? ('✘') : '')
+
+  let friends;
+  if(isAuthed){
+    friends = (
+            <button type="button" onClick={() => setFriendsModalIsOpen(true)}>
+              Friends
+            </button>
+    );
+  }
 
   return (
     <div>
@@ -39,6 +51,9 @@ export const Header = ({
           <button type="button" onClick={() => setSettingsModalIsOpen(true)}>
             <Settings />
           </button>
+
+          {friends}
+
           <h1 className={"flex-1 text-center text-l xxs:text-lg sm:text-3xl tracking-wide font-bold font-og"}>
             WORDLE ARCHIVE {day} {header_symbol}
           </h1>
@@ -49,6 +64,13 @@ export const Header = ({
             <Info />
           </button>
         </header>
+        <FriendsModal
+          isOpen={friendModalIsOpen}
+          handleClose={() => setFriendsModalIsOpen(false)}
+          styles={darkMode ? modalStylesDark : modalStyles}
+          darkMode={darkMode}
+          db={db}
+        />
         <SettingsModal
           isOpen={settingsModalIsOpen}
           handleClose={() => setSettingsModalIsOpen(false)}
