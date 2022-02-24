@@ -71,7 +71,7 @@ export default function Board({
                 mode
               )}`}
             >
-              {letter}
+              {colorsOnly ? '' : letter}
             </span>
           ))
         )}
