@@ -2,7 +2,13 @@
 import { initializeApp as fbInit } from "firebase/app";
 import { getAnalytics as fbGetAnalytics } from "firebase/analytics";
 import { getAuth, signInAnonymously, onAuthStateChanged} from "firebase/auth";
-import { getDatabase, get, set, ref, child } from "firebase/database";
+import { getDatabase,
+  get as fbGet,
+  set as fbSet,
+  update as fbUpdate,
+  ref as fbRef,
+  child as fbChild
+} from "firebase/database";
 import { getFirestore } from "firebase/firestore"
 import { collection, getDocs, query, where } from "firebase/firestore";
 
@@ -55,46 +61,73 @@ export class wbDb {
     return `users/${id}`
   }
 
+  _userFollowsPath(id){
+    return `userFollows/${this._user.uid}/${id || ''}`
+  }
+
+  _followsUserPath(id){
+    return `followsUser/${id}/${this._user.uid}`
+  }
+
+
   _gamesPath(day){
     return `${this._userPath()}/games/${day}`;
   }
 
   _setLastLogin(){
-    return set(ref(this._db, `${this._userPath()}/last_login`), Date.now());
+    return fbSet(fbRef(this._db, `${this._userPath()}/last_login`), Date.now());
   }
 
-  _getUser(id = this._user?.uid){
-    return get(child(ref(this._db), this._userPath(id)))
-      .then( snapshot => {
-        if(snapshot.exists()){
-          return snapshot.val();
-        } else {
-          return null;
-        }
-      });
+  async _dbFetch(path){
+    const snapshot = await fbGet(fbChild(fbRef(this._db), path))
+
+    if(snapshot.exists()){
+      return snapshot.val();
+    } else {
+      return null;
+    }
   }
 
-  _initUserProfile(){
-    return this._getUser().then(data => {
-      if(data){
-        this._userProfile = data;
-      } else {
-        // default profile for new user
-        this._userProfile = {
-          games:{}
-        }
+  async _getUserProfile(id = this._user?.uid){
+    return await this._dbFetch(this._userPath(id));
+  }
+
+  async _getUserFollows(){
+    return await this._dbFetch(this._userFollowsPath());
+  }
+
+  async _initUserProfile(){
+    const data = await this._getUserProfile();
+    this._userFollows = await this._getUserFollows();
+    if(data){
+      this._userProfile = data;
+    } else {
+      // default profile for new user
+      this._userProfile = {
+        games:{}
       }
+    }
 
-      return this._userProfile;
-    });
+    return this._userProfile;
   }
 
   _updateUserProfile(element, data){
     let path = `${this._userPath()}/${element}`
-    return set(ref(this._db, path), data);
+    return fbSet(fbRef(this._db, path), data);
   }
 
-  _onAuth(user){
+
+  // This assumes the proper error checking has already been done
+  // And the friend does not already exist or it will be overwritten
+  _addFriend(id){
+    const friendData = { timestamp: Date.now() };;
+    const updates = {};
+    updates[`${this._userFollowsPath(id)}`] = friendData;
+    updates[`${this._followsUserPath(id)}`] = friendData;
+    return fbUpdate(fbRef(this._db), updates);
+  }
+
+  async _onAuth(user){
   // Triggers on firebase auth change
     if (user) {
       if(!this._user){
@@ -107,14 +140,13 @@ export class wbDb {
         this._user = user;
 
         // Set last login time This will also create the user if necessary
-        this._setLastLogin();
+        await this._setLastLogin();
 
-        // Get profile if it exists
-        return this._initUserProfile()
-          .then(() => {
-            this._authCallback?.(this._userProfile);
-            return this._userProfile;
-          });
+        // Get profile (which should exist after the above)
+        await this._initUserProfile()
+
+        this._authCallback?.(this._userProfile);
+        return this._userProfile;
       }
     } else {
       // User is signed out
@@ -144,7 +176,7 @@ export class wbDb {
       throw new Error('Name is not a string');
     }
     this._userProfile.name = name;  // this is ugly, but not sure how to avoid without unecessary fetches
-    return set(ref(this._db, `${this._userPath()}/name`), name);
+    return fbSet(fbRef(this._db, `${this._userPath()}/name`), name);
   }
 
 
@@ -173,7 +205,7 @@ export class wbDb {
       console.log(`Logging game ${day}`);
       console.log(st);
       //TODO: update streak as well
-      set(ref(this._db, this._gamesPath(day)), st)
+      fbSet(fbRef(this._db, this._gamesPath(day)), st)
         .then( () => {
 
           //add it locally as well
@@ -187,35 +219,29 @@ export class wbDb {
     }
   }
 
-  addFriendWithId(id){
+  async addFriendWithId(id){
     if(!this._userProfile) return Promise.resolve({ error: 'User is not initialized' });
     // Look up friend
-    return this._getUser(id)
-      .then( data => {
-        console.log(`Got data for user ${id}`);
-        console.log(data);
-        // If exists add id to current user
-        // Yield data
-        if(!data){
-          return { error: 'Could not find friend' }
-        }
-        return data;
-      }).then( data => {
-        if(data.error) return data;
-        if(this._userProfile.friends?.[id]) return data; //Already friends
-        return this._updateUserProfile(`friends/${id}`, Date.now())
-          .then( d => {
-            return data;
-          })
-          .catch( e => {
-            return { error: e }
-          });
-      })
-      .catch( e => {
-        console.log(e);
-        return { error: e };
-      });
+    try {
+      const friendData = await this._getUserProfile(id)
+      console.log(`Got data for user ${id}`);
+      console.log(friendData);
+      // If exists add id to current user
+      // Yield data
+      if(!friendData){
+        return { error: 'Could not find friend' }
+      }
 
+      if(this._userFollows?.[id]){
+        return friendData; //Already friends
+      }
+
+      await this._addFriend(id);
+
+      return friendData;
+    } catch(e) {
+      console.log(e);
+      return { error: e };
+    };
   }
-
 }
