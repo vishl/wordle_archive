@@ -3,6 +3,10 @@ import { initializeApp as fbInit } from "firebase/app";
 import { getAnalytics as fbGetAnalytics } from "firebase/analytics";
 import { getAuth, signInAnonymously, onAuthStateChanged} from "firebase/auth";
 import { getDatabase, get, set, ref, child } from "firebase/database";
+import { getFirestore } from "firebase/firestore"
+import { collection, getDocs, query, where } from "firebase/firestore";
+
+
 
 
 
@@ -13,6 +17,7 @@ export class wbDb {
     this._fbAnalytics = fbGetAnalytics(this._fbApp);
     this._auth = getAuth();
     this._db = getDatabase(this._fbApp);
+    this._dbs = getFirestore();
     this._userProfile = null;
     this._user = null;
     this._authCallback = options.authCallBack;
@@ -23,6 +28,21 @@ export class wbDb {
   }
 
   // Private methods
+  async _test(){
+    console.log('xx start');
+    let s = await getDocs(collection(this._dbs, 'users'));
+    console.log(`xx Got ${s.length} users`);
+    console.log(s);
+    s.forEach((doc) => {
+      console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
+    });
+
+    s = await getDocs(query(collection(this._dbs, 'users'), where('friendsOf', 'array-contains', '185WhOC8UjQT6WkgmLbF')));
+    console.log('Got friends of 185WhOC8UjQT6WkgmLbF');
+    s.forEach((doc) => {
+      console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
+    });
+  }
 
   _init(){
     // Register auth state changed callback
@@ -81,6 +101,8 @@ export class wbDb {
         // User is signed in for the first time
         console.log('Successfully Authed');
         console.log(user.uid);
+
+        // this._test();
 
         this._user = user;
 
