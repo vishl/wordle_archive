@@ -6,6 +6,7 @@ import Success from '../data/Success.png'
 import Fail from '../data/Cross.png'
 import WIP from '../data/WIP3.png'
 import {AllFriendsGame} from './FriendDisplay'
+import {Name} from './name'
 
 Modal.setAppElement('#root')
 
@@ -111,6 +112,16 @@ export const EndGameModal = ({
     )
   }
 
+  let name = null;
+  if(!db?.getUserProfile()?.name){
+    name = (
+      <div>
+        Before you share, make sure you enter your name!
+        <Name db={db}/>
+      </div>
+    )
+  }
+
   return (
     <Modal
       isOpen={isOpen}
@@ -127,7 +138,7 @@ export const EndGameModal = ({
             <Close />
           </button>
         </div>
-        <div className="h-full flex flex-col items-center mx-auto text-primary dark:text-primary-dark">
+        <div className="h-full flex flex-col items-center text-center mx-auto text-primary dark:text-primary-dark">
           {gameState === state.won && (
             <div className="max-w-[300px]">
               <img src={Success} alt="success" height="auto" width="auto" />
@@ -158,6 +169,7 @@ export const EndGameModal = ({
               Lost: {losses}
             </p>
           </div>
+          {name}
           <ShareButton />
           <div className="w-full">
             <AllFriendsGame
