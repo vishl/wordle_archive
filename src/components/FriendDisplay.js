@@ -92,9 +92,10 @@ export function AllFriendsGame({ friendsData, userData, gameId, colorBlindMode})
         centerMode
         centerSlidePercentage={70}
         showStatus={false}
+        infiniteLoop={true}
       >
         { sortedGames.map((g) =>
-            <div className="mb-5" key={g.id} >
+            <div className="m-5" key={g.id} >
               <FriendGame
                 friendData={g.game}
                 userData={userData.games[gameId]}
@@ -127,9 +128,10 @@ export function FriendAllGames({friendData, userData, colorBlindMode}){
         centerMode
         centerSlidePercentage={70}
         showStatus={false}
+        infiniteLoop={true}
       >
         { sortedGames.map((g) =>
-            <div className="mb-5" key={g.gameIndex} >
+            <div className="m-5" key={g.gameIndex} >
               <FriendGame
                 friendData={g}
                 userData={userData.games[g.gameIndex]}

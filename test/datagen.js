@@ -49,7 +49,7 @@ function createTestUsers(){
     }
   }
 
-  for(let i=0; i< 1; i++){
+  for(let i=0; i< 9; i++){
     createUser({friendOf:baseUserId, games:games});
   }
 }
