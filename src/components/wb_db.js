@@ -149,6 +149,7 @@ export class wbDb {
 
         // Get profile (which should exist after the above)
         await this._initUserProfile()
+        await this.fetchFriends();    //default friend fetch after we get the follows
 
         this._authCallback?.(this._userProfile);
         return this._userProfile;
@@ -273,6 +274,8 @@ export class wbDb {
     }
 
     data.forEach( d => this._friendsData[d.id]=d)
+
+    console.log(`Got friends detail for ${data.length} friends`);
 
     return this.friendsData();
   }
