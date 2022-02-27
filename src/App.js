@@ -46,8 +46,8 @@ class wbUrlHandler {
     if(!s){return}
 
     let obj = qs.parse(s);
-    let id = obj.f
-    if(id.match(/^\w+$/)){
+    let id = obj.u
+    if(id?.match(/^\w+$/)){
       console.log(`Got friend ${id}`);
       return id
     }else{
@@ -71,13 +71,14 @@ class wbUrlHandler {
   }
 
   setGame(game){
-    //TODO set url to /g/${game}
+    let url = `/g/${game}`
+    if(db?.getUserProfile()?.id){
+      url += `?u=${db.getUserProfile().id}`
+    }
+    console.log(`Pushing state ${url}`);
+    window.history.pushState({}, '', url)
   }
 }
-
-const urlHandler = new wbUrlHandler();
-const friend = urlHandler.getInitialFriend();
-
 
 const setDay = newDay => {
   if (newDay < 1 || newDay > og_day) return;
@@ -99,9 +100,10 @@ const toDate = (day) => {
   return date1
 }
 
-var day;
+let urlHandler;
+let friend;
 const og_day = getOGDay() //This is today
-setDay(urlHandler.getInitialGame());
+var day = og_day;
 var items_list = []
 for (var i=1;i<=og_day;i++) {
   items_list.push(i)
@@ -130,6 +132,9 @@ function App() {
 
     // Initialize Firebase
     db = new wbDb(firebaseConfig, { authCallBack: onAuth });
+    urlHandler = new wbUrlHandler();
+    friend = urlHandler.getInitialFriend();
+    playDay(urlHandler.getInitialGame()); // this overwrites the url so call it after we handle the friend
     db.signIn();
   }
 
@@ -214,6 +219,7 @@ function App() {
         console.log('Opening friend modal');
         setAddFriendModalIsOpen(true);
       }
+      urlHandler.setGame(day);
     }
   }, [isAuthed]);
 
@@ -246,14 +252,14 @@ function App() {
     }
   }, [])
 
-  useEffect(() => {
-    if (reloadCount < 1) {
-      window.location.reload(true);
-      sessionStorage.setItem('reloadCount', String(reloadCount + 1));
-    } else {
-      sessionStorage.removeItem('reloadCount');
-    }
-  }, [og_day])
+  // useEffect(() => {
+  //   if (reloadCount < 1) {
+  //     window.location.reload(true);
+  //     sessionStorage.setItem('reloadCount', String(reloadCount + 1));
+  //   } else {
+  //     sessionStorage.removeItem('reloadCount');
+  //   }
+  // }, [og_day])
 
   const addLetter = (letter) => {
     document.activeElement.blur()
