@@ -499,6 +499,9 @@ function App() {
           day={day}
           currentRow={currentRow}
           cellStatuses={cellStatuses}
+          colorBlindMode={colorBlindMode}
+          gameId={day}
+          db={db}
         />
 
         <Keyboard

@@ -15,7 +15,7 @@ export function FriendSummary({friendData}) {
   );
 }
 
-export function FriendGame({ friendData, userData, colorBlindMode}){
+export function FriendGame({ friendData, userData, colorBlindMode, name}){
   if(!friendData){
     //friend has not played the game
     return <div />
@@ -24,16 +24,89 @@ export function FriendGame({ friendData, userData, colorBlindMode}){
   // if user hasn't played the game don't display the answer, just the colors
   let colorsOnly = !userData;
 
+  let footer = <div />
+  if(colorsOnly){
+    footer = (
+      <div>
+        <div>
+          Play to see results
+        </div>
+        <div>
+          <a href={`/g/${friendData.gameIndex}`}>
+            <button
+              type="button"
+              className="rounded px-2 py-2 mt-2 w-24 text-sm nm-inset-n-green text-gray-50"
+            >Play
+            </button>
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Board
-      colorBlindMode={false}
-      board={friendData.board}
-      cellStatuses={friendData.cellStatuses}
-      colorsOnly={colorsOnly}
-      mode='small'
-    />
+    <div>
+      <Board
+        colorBlindMode={false}
+        board={friendData.board}
+        cellStatuses={friendData.cellStatuses}
+        colorsOnly={colorsOnly}
+        mode='small'
+      />
+      <div className="mb-10">
+        <div>
+          {name && `${name} played`} Game #{friendData.gameIndex}
+        </div>
+        <div>
+          Played at {new Date(friendData.timestamp).toLocaleString()}
+        </div>
+        {footer}
+      </div>
+    </div>
 
   )
+}
+
+export function AllFriendsGame({ friendsData, userData, gameId, colorBlindMode}){
+  if (!friendsData){
+    return (<div />)
+  }
+
+  let sortedGames = Object.values(friendsData)
+    .map( d => {
+      return {name: d.name, id: d.id, game: d.games?.[gameId]}
+    }) // get the game if it exists
+    .filter( d => d.game) // remove nulls
+    .sort((a, b) => {
+      return a.timestamp > b.timestamp;
+    });
+
+  return (
+    <div>
+      <div>
+        {sortedGames.length} friends have completed this game
+      </div>
+      <Carousel
+        styles={styles}
+        showThumbs={false}
+        centerMode
+        centerSlidePercentage={70}
+        showStatus={false}
+      >
+        { sortedGames.map((g) =>
+            <div className="mb-5" key={g.id} >
+              <FriendGame
+                friendData={g.game}
+                userData={userData.games[gameId]}
+                colorBlindMode={colorBlindMode}
+                name={g.name}
+              />
+            </div>
+          )
+        }
+      </Carousel>
+    </div>
+  );
 }
 
 export function FriendAllGames({friendData, userData, colorBlindMode}){
@@ -62,20 +135,6 @@ export function FriendAllGames({friendData, userData, colorBlindMode}){
                 userData={userData.games[g.gameIndex]}
                 colorBlindMode={colorBlindMode}
               />
-              <div className="mb-10">
-                <div>
-                  {new Date(g.timestamp).toLocaleString()}
-                </div>
-                <div>
-                  <a href={`/g/${g.gameIndex}`}>
-                    <button
-                      type="button"
-                      className="rounded px-2 py-2 mt-2 w-24 text-sm nm-inset-n-green text-gray-50"
-                      >Play
-                    </button>
-                  </a>
-                </div>
-              </div>
             </div>
           )
         }

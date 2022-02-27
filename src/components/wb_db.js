@@ -1,6 +1,6 @@
 
 import { initializeApp as fbInit } from "firebase/app";
-import { getAnalytics as fbGetAnalytics } from "firebase/analytics";
+import { getAnalytics as fbGetAnalytics, isSupported as fbAnalyticsIsSupported } from "firebase/analytics";
 import { getAuth, signInAnonymously, onAuthStateChanged} from "firebase/auth";
 import { getDatabase,
   get as fbGet,
@@ -20,7 +20,6 @@ export class wbDb {
   constructor(fbConfig, options){
     // Private Members
     this._fbApp = fbInit(fbConfig);
-    this._fbAnalytics = fbGetAnalytics(this._fbApp);
     this._auth = getAuth();
     this._db = getDatabase(this._fbApp);
     this._dbs = getFirestore();
@@ -31,6 +30,7 @@ export class wbDb {
 
     // Public Members
 
+    // Initialization
     this._init();
   }
 
@@ -55,6 +55,12 @@ export class wbDb {
     // Register auth state changed callback
     onAuthStateChanged(this._auth, (user) => {
       this._onAuth(user);
+    });
+
+    fbAnalyticsIsSupported().then( (r) => {
+      if(r){
+        this._fbAnalytics = fbGetAnalytics(this._fbApp);
+      }
     });
   }
 
@@ -277,10 +283,10 @@ export class wbDb {
 
     console.log(`Got friends detail for ${data.length} friends`);
 
-    return this.friendsData();
+    return this.getFriendsData();
   }
 
-  friendsData(){
+  getFriendsData(){
     return this._getFriendIdArray().map(d => this._friendsData[d]);
   }
 }

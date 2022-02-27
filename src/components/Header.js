@@ -40,7 +40,7 @@ export const Header = ({
   if(isAuthed){
     friends = (
             <button type="button" onClick={() => setFriendsModalIsOpen(true)}>
-              {db.friendsData().length} Friend{db.friendsData().length !== 1 ? 's' : ''}
+              {db.getFriendsData().length} Friend{db.getFriendsData().length !== 1 ? 's' : ''}
             </button>
     );
   }

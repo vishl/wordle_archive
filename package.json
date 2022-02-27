@@ -18,7 +18,8 @@
     "firebase": "^9.6.6",
     "react-hook-form": "^7.27.0",
     "query-string":"^7.1.1",
-    "react-responsive-carousel":"^3.2.22"
+    "react-responsive-carousel":"^3.2.22",
+    "dotenv":"^16.0.0"
   },
   "scripts": {
     "predeploy": "npm run build",

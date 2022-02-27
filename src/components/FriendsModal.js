@@ -2,10 +2,12 @@
 import { ReactComponent as Close } from '../data/Close.svg'
 import Modal from 'react-modal'
 import {FriendAllGames, FriendSummary} from './FriendDisplay'
+import structuredClone from '@ungap/structured-clone';
 
 Modal.setAppElement('#root')
 
 export const FriendsModal = ({ isOpen, handleClose, darkMode, colorBlindMode, styles, db }) => {
+  styles = structuredClone(styles); //deep copy because apparently this is a ref
 
   styles.content.maxHeight = null;
 
@@ -19,9 +21,8 @@ export const FriendsModal = ({ isOpen, handleClose, darkMode, colorBlindMode, st
           <Close />
         </button>
         <div className="h-full flex flex-col items-center justify-center max-w-[390px] mx-auto pt-9 text-primary dark:text-primary-dark">
-          <div className={`h-full ${darkMode ? 'dark' : ''}`}>
-            {db.friendsData().map( d =>
-            <div key={d.id} >
+            {db.getFriendsData().map( d =>
+            <div key={d.id} className="h-full max-w-[390px]">
               <div>
                 {d.name}
               </div>
@@ -32,7 +33,6 @@ export const FriendsModal = ({ isOpen, handleClose, darkMode, colorBlindMode, st
               />
             </div>
             )}
-          </div>
         </div>
       </div>
     </Modal>
