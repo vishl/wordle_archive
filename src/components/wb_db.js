@@ -27,6 +27,7 @@ export class wbDb {
     this._userProfile = null;
     this._user = null;
     this._authCallback = options.authCallBack;
+    this._friendsData = {};
 
     // Public Members
 
@@ -75,7 +76,11 @@ export class wbDb {
   }
 
   _setLastLogin(){
-    return fbSet(fbRef(this._db, `${this._userPath()}/last_login`), Date.now());
+    return this._updateUserProfile({
+      last_login: Date.now(),
+      id: this._user.uid
+    });
+    // return fbSet(fbRef(this._db, `${this._userPath()}/last_login`), Date.now());
   }
 
   async _dbFetch(path){
@@ -111,9 +116,8 @@ export class wbDb {
     return this._userProfile;
   }
 
-  _updateUserProfile(element, data){
-    let path = `${this._userPath()}/${element}`
-    return fbSet(fbRef(this._db, path), data);
+  _updateUserProfile(data){
+    return fbUpdate(fbRef(this._db, this._userPath()), data);
   }
 
 
@@ -124,6 +128,7 @@ export class wbDb {
     const updates = {};
     updates[`${this._userFollowsPath(id)}`] = friendData;
     updates[`${this._followsUserPath(id)}`] = friendData;
+    //NB: This appears to call Set on each path here, not update...?? Why
     return fbUpdate(fbRef(this._db), updates);
   }
 
@@ -153,22 +158,27 @@ export class wbDb {
     }
   }
 
-  _fetchFriends(){
-  }
+  // Returns a cached sorted array of friends (most recent first)
+  // Does not fetch anything just uses already fetched data
+  _getFriendIdArray(){
+    if(!this._userFollows){
+      return [];
+    }
 
+    if(this._friendIdArray){
+      return this._friendIdArray;
+    }
+
+    this._friendIdArray = Object.keys(this._userFollows)
+      .sort( (a, b) => this._userFollows[a].timestamp > this._userFollows[b].timestamp );
+
+    return this._friendIdArray;
+  }
 
   // Public methods
   getUserProfile(){
     //TODO: should return a deep copy or something here to prevent mutation
     return this._userProfile;
-  }
-
-  fetchFriends(){
-    if(this._friends){
-      return Promise.resolve(this._friends);
-    }
-
-    return this._fetchFriends();
   }
 
   setName(name){
@@ -220,14 +230,15 @@ export class wbDb {
   }
 
   async addFriendWithId(id){
-    if(!this._userProfile) return Promise.resolve({ error: 'User is not initialized' });
+    if(!this._userProfile){
+      return { error: 'User is not initialized' };
+    }
+
     // Look up friend
     try {
       const friendData = await this._getUserProfile(id)
       console.log(`Got data for user ${id}`);
       console.log(friendData);
-      // If exists add id to current user
-      // Yield data
       if(!friendData){
         return { error: 'Could not find friend' }
       }
@@ -236,12 +247,37 @@ export class wbDb {
         return friendData; //Already friends
       }
 
+      // If exists add follow to current user
       await this._addFriend(id);
 
       return friendData;
+
     } catch(e) {
       console.log(e);
       return { error: e };
     };
+  }
+
+  // Offset is for pagination
+  // Fetches friends in timestamp order from most recent
+  async fetchFriends(offset = 0, limit = 100){
+    const friendIdArray = this._getFriendIdArray().slice(offset, offset + limit);
+    if(friendIdArray.length === 0){
+      return null;
+    }
+
+    const data = await Promise.all(friendIdArray.map( (d) => this._getUserProfile(d)));
+
+    if(!this._friendsData){
+      this._friendsData = {};
+    }
+
+    data.forEach( d => this._friendsData[d.id]=d)
+
+    return this.friendsData();
+  }
+
+  friendsData(){
+    return this._getFriendIdArray().map(d => this._friendsData[d]);
   }
 }

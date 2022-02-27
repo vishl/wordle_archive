@@ -34,13 +34,13 @@ export const Header = ({
     setInfoModalIsOpen(false)
   }
 
-  let header_symbol = (gameStateList[day-1] == 'won') ? ('✔') : ((gameStateList[day-1] == 'lost') ? ('✘') : '')
+  let header_symbol = (gameStateList[day-1] === 'won') ? ('✔') : ((gameStateList[day-1] === 'lost') ? ('✘') : '')
 
   let friends;
   if(isAuthed){
     friends = (
             <button type="button" onClick={() => setFriendsModalIsOpen(true)}>
-              Friends
+              {db.friendsData().length} Friend{db.friendsData().length !== 1 ? 's' : ''}
             </button>
     );
   }

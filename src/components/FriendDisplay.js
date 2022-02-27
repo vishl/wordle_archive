@@ -10,7 +10,7 @@ export function FriendSummary({friendData}) {
 
   return (
     <div>
-      <li> Played {Object.values(friendData.games)?.length || 0} games </li>
+      <li> Played {Object.values(friendData.games || {}).length || 0} games </li>
     </div>
   );
 }
