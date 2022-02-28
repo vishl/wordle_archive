@@ -58,18 +58,14 @@ export const EndGameModal = ({
     setButtonPressed(true)
     navigator.clipboard.writeText(
       `Wordle ${day} ${gameState === state.won ? currentRow: 'X'}/6\n\n` +
-      cellStatuses
-      .map((row) => {
+      cellStatuses.map((row) => {
         if (row.every((item) => item !== status.unguessed)) {
-          return (
-            row
-            .map((state) => {
+          return ( row.map((state) => {
               switch (state) {
                 case status.gray:
                   if (darkMode) {
                     return '⬛'
-                  }
-                  else {
+                  } else {
                     return '⬜'
                   }
                 case status.green:
@@ -79,14 +75,13 @@ export const EndGameModal = ({
                 default:
                   return '  '
               }
-            })
-            .join('') + '\n'
+            }).join('') + '\n'
           )
         } else {
           return ''
         }
       })
-      .join('')
+      .join('') + '\n' + window.location
     )
   }
 
