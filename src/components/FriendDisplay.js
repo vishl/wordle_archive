@@ -98,7 +98,7 @@ export function AllFriendsGame({ friendsData, userData, gameId, colorBlindMode})
             <div className="m-5" key={g.id} >
               <FriendGame
                 friendData={g.game}
-                userData={userData.games[gameId]}
+                userData={userData?.games?.[gameId]}
                 colorBlindMode={colorBlindMode}
                 name={g.name}
               />
@@ -134,7 +134,7 @@ export function FriendAllGames({friendData, userData, colorBlindMode}){
             <div className="m-5" key={g.gameIndex} >
               <FriendGame
                 friendData={g}
-                userData={userData.games[g.gameIndex]}
+                userData={userData?.games?.[g.gameIndex]}
                 colorBlindMode={colorBlindMode}
               />
             </div>

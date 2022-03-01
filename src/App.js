@@ -196,6 +196,7 @@ function App() {
   const closeModal = () => setIsOpen(false)
   function addFriendModalShouldClose(){
     setAddFriendModalIsOpen(false);
+    friend = null; //we're done with you
   }
 
   const [darkMode, setDarkMode] = useLocalStorage('dark-mode', false)
@@ -218,7 +219,6 @@ function App() {
       if(friend && friend !== db.getUserId()) {
         console.log('Opening friend modal');
         setAddFriendModalIsOpen(true);
-        friend = null;  // we're done with ou
       }
       urlHandler.setGame(day);
     }
