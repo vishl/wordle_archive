@@ -215,9 +215,10 @@ function App() {
   useEffect(() => {
     if(isAuthed){
       console.log('Got Auth');
-      if(friend) {
+      if(friend && friend !== db.getUserId()) {
         console.log('Opening friend modal');
         setAddFriendModalIsOpen(true);
+        friend = null;  // we're done with ou
       }
       urlHandler.setGame(day);
     }

@@ -188,6 +188,10 @@ export class wbDb {
     return this._userProfile;
   }
 
+  getUserId(){
+    return this._user?.uid;
+  }
+
   setName(name){
     if(typeof name !== 'string'){
       throw new Error('Name is not a string');
