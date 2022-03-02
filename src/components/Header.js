@@ -3,6 +3,8 @@ import { useEffect, useState, useRef } from 'react'
 import { ReactComponent as Settings } from '../data/Settings.svg'
 import { ReactComponent as Share } from '../data/Share.svg'
 import { ReactComponent as Info } from '../data/Info.svg'
+import { ReactComponent as Left } from '../data/chevron-left.svg'
+import { ReactComponent as Right } from '../data/chevron-right.svg'
 import { InfoModal } from './InfoModal'
 import { SettingsModal } from './SettingsModal'
 import { FriendsModal } from './FriendsModal'
@@ -19,6 +21,10 @@ export const Header = ({
   toggleDarkMode,
   toggleColorBlindMode,
   toggleShareModal,
+  playFirst,
+  playPrevious,
+  playNext,
+  playLast,
   isAuthed,
   db
 }) => {
@@ -55,7 +61,15 @@ export const Header = ({
           {friends}
 
           <h1 className={"flex-1 text-center text-l xxs:text-lg sm:text-3xl tracking-wide font-bold font-og"}>
-            WORD BIRD {day} {header_symbol}
+            <button className="pr-4" onClick={playPrevious} >
+              <i class="fa-solid fa-angle-left"></i>
+            </button>
+            <button className="font-bold" onClick={playLast} >
+              WORD BIRD {day}
+            </button>
+            <button className="pl-4" onClick={playNext} >
+              <i class="fa-solid fa-angle-right"></i>
+            </button>
           </h1>
           <button className="mr-2" type="button" onClick={toggleShareModal}>
             <Share />

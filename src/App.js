@@ -458,18 +458,11 @@ function App() {
           colorBlindMode={colorBlindMode}
           toggleColorBlindMode={toggleColorBlindMode}
           toggleShareModal={toggleShareModal}
-          isAuthed={isAuthed}
-          db={db}
-        />
-
-        <Nav
           playPrevious = {playPrevious}
-          playRandom   = {playRandom}
           playNext     = {playNext}
           playLast     = {playLast}
-          playFirst    = {playFirst}
-          items_list   = {items_list}
-          gameStateList = {gameStateList}
+          isAuthed={isAuthed}
+          db={db}
         />
 
         <Board
