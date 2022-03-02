@@ -192,6 +192,10 @@ export class wbDb {
     return this._user?.uid;
   }
 
+  getGame(id){
+    return this._userProfile?.games[id];
+  }
+
   setName(name){
     if(typeof name !== 'string'){
       throw new Error('Name is not a string');

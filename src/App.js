@@ -146,6 +146,19 @@ function App() {
     }
   }
 
+  function reloadGame(){
+    const game = db.getGame(day);
+    if(!game) {
+      return;
+    }
+
+    setAnswer(game.answer);
+    // setCellStatuses(game.cellStatuses);
+    setBoard(game.board);
+    setLetterStatuses(game.letterStatuses);
+    setGameState(game.gameState);
+  }
+
 
   console.log('Run');
 
@@ -221,6 +234,7 @@ function App() {
         setAddFriendModalIsOpen(true);
       }
       urlHandler.setGame(day);
+      reloadGame();
     }
   }, [isAuthed]);
 
