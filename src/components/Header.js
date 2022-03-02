@@ -45,8 +45,8 @@ export const Header = ({
   let friends;
   if(isAuthed){
     friends = (
-            <button type="button" onClick={() => setFriendsModalIsOpen(true)}>
-              {db.getFriendsData().length} Friend{db.getFriendsData().length !== 1 ? 's' : ''}
+            <button type="button" className="pl-4" onClick={() => setFriendsModalIsOpen(true)}>
+              <i className="fa-solid fa-user-group"></i>
             </button>
     );
   }
@@ -62,13 +62,13 @@ export const Header = ({
 
           <h1 className={"flex-1 text-center text-l xxs:text-lg sm:text-3xl tracking-wide font-bold font-og"}>
             <button className="pr-4" onClick={playPrevious} >
-              <i class="fa-solid fa-angle-left"></i>
+              <i className="fa-solid fa-angle-left"></i>
             </button>
             <button className="font-bold" onClick={playLast} >
               WORD BIRD {day}
             </button>
             <button className="pl-4" onClick={playNext} >
-              <i class="fa-solid fa-angle-right"></i>
+              <i className="fa-solid fa-angle-right"></i>
             </button>
           </h1>
           <button className="mr-2" type="button" onClick={toggleShareModal}>
