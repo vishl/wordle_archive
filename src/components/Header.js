@@ -55,7 +55,7 @@ export const Header = ({
           {friends}
 
           <h1 className={"flex-1 text-center text-l xxs:text-lg sm:text-3xl tracking-wide font-bold font-og"}>
-            WORDLE ARCHIVE {day} {header_symbol}
+            WORD BIRD {day} {header_symbol}
           </h1>
           <button className="mr-2" type="button" onClick={toggleShareModal}>
             <Share />
