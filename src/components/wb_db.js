@@ -193,7 +193,7 @@ export class wbDb {
   }
 
   getGame(id){
-    return this._userProfile?.games[id];
+    return this._userProfile?.games?.[id];
   }
 
   setName(name){

@@ -153,7 +153,8 @@ function App() {
     }
 
     setAnswer(game.answer);
-    // setCellStatuses(game.cellStatuses);
+    setCurrentRow(6);
+    setCellStatuses(game.cellStatuses);
     setBoard(game.board);
     setLetterStatuses(game.letterStatuses);
     setGameState(game.gameState);
