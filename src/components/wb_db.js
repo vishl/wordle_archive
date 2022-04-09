@@ -3,6 +3,7 @@ import { initializeApp as fbInit } from "firebase/app";
 import { getAnalytics as fbGetAnalytics, isSupported as fbAnalyticsIsSupported } from "firebase/analytics";
 import { getAuth, signInAnonymously, onAuthStateChanged} from "firebase/auth";
 import { getDatabase,
+  connectDatabaseEmulator,
   get as fbGet,
   set as fbSet,
   update as fbUpdate,
@@ -22,6 +23,14 @@ export class wbDb {
     this._fbApp = fbInit(fbConfig);
     this._auth = getAuth();
     this._db = getDatabase(this._fbApp);
+
+    if (options.local) {
+      // Point to the RTDB emulator running on localhost.
+      connectAuthEmulator(this._auth, "http://localhost:9099");
+      connectDatabaseEmulator(this._db, "localhost", 9000);
+    }
+
+
     this._dbs = getFirestore();
     this._userProfile = null;
     this._user = null;

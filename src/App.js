@@ -131,7 +131,8 @@ function App() {
     }
 
     // Initialize Firebase
-    db = new wbDb(firebaseConfig, { authCallBack: onAuth });
+    const localDb = window.location.hostname === "localhost"; // TODO support arg to override
+    db = new wbDb(firebaseConfig, { authCallBack: onAuth, local: localDb });
     urlHandler = new wbUrlHandler();
     friend = urlHandler.getInitialFriend();
     playDay(urlHandler.getInitialGame()); // this overwrites the url so call it after we handle the friend
