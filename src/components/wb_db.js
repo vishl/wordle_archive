@@ -1,7 +1,7 @@
 
 import { initializeApp as fbInit } from "firebase/app";
 import { getAnalytics as fbGetAnalytics, isSupported as fbAnalyticsIsSupported } from "firebase/analytics";
-import { getAuth, signInAnonymously, onAuthStateChanged} from "firebase/auth";
+import { getAuth, signInAnonymously, onAuthStateChanged, connectAuthEmulator} from "firebase/auth";
 import { getDatabase,
   connectDatabaseEmulator,
   get as fbGet,
@@ -25,6 +25,7 @@ export class wbDb {
     this._db = getDatabase(this._fbApp);
 
     if (options.local) {
+      console.log("Using local emulation");
       // Point to the RTDB emulator running on localhost.
       connectAuthEmulator(this._auth, "http://localhost:9099");
       connectDatabaseEmulator(this._db, "localhost", 9000);
