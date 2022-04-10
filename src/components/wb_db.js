@@ -223,14 +223,6 @@ export class wbDb {
 
     // only Anon is supported right now
     return signInAnonymously(this._auth)
-
-      // .then(() => {
-      // })
-      // .catch((error) => {
-      //   // const errorCode = error.code;
-      //   // const errorMessage = error.message;
-      //   // ...
-      // });
   }
 
   logGame(st){
