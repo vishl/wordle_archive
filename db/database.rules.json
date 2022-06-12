@@ -3,13 +3,15 @@
     ".read": true,
     "users":{
       "$uid":{
-        ".write": "auth != null && auth.uid == $uid"
+        //Only you can write your user
+        ".write": "auth != null && auth.uid == $uid" 
       }
     },
     "followsUser":{
       "$otherId":{
         "$uid":{
-          ".write": true, //TODO you can only write your own user id in here
+          //You can only write your own user id in as a follower
+          ".write": "auth != null && auth.uid == $uid"
         }
       }
     }

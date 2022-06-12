@@ -30,6 +30,12 @@ async function assertEq(env, path, obj){
   });
 }
 
+async function createEntry(env, path, data){
+  await env.withSecurityRulesDisabled(async context => {
+    await context.database().ref(path).set(data);
+  });
+}
+
 
 test('users collection access', async () => {
   const env = await dbSetup();
@@ -50,23 +56,31 @@ test('users collection access', async () => {
     await assertFails(authedDb.ref('users/sally').set({bar:true}));
 });
 
-//test('write to followsUser collection'), async() => {
-//  expect.assertions(2);
-//  const env = await dbSetup();
+test('write to followsUser collection', async() => {
+  const env = await dbSetup();
 
-//  let path = 'followsUser/user1';
-//  let userId = 'bob'
+  let path = 'followsUser/user1';
+  let userId = 'bob'
 
-//  //create an entry for user1 with a follower user2
-//  await env.withSecurityRulesDisabled(async context => {
-//    await context.database().ref(path).set({ user2: 0 });
-//  });
+  //create an entry for user1 with a follower user2
+  await createEntry(env, path, {user2:0});
 
-//  const authedDb = env.authenticatedContext(userId).database();
+  //auth as userId
+  const authedDb = env.authenticatedContext(userId).database();
 
-//  //should be able to set self as follower of another user
-//  let packet = {};
-//  packet[userId] = 0;
-//  await authedDb.ref(path).update(packet);
+  //should be able to set self as follower of another user
+  let packet = {};
+  packet[userId] = 0;
+  await assertSucceeds(authedDb.ref(path).update(packet));
 
-//}
+  assertEq(env, path, {
+    user2:0,
+    userId:0
+  });
+
+  //should not be able to write anything else as a follower
+
+  packet = {baz:0}
+  await assertFails(authedDb.ref(path).update(packet));
+
+});
