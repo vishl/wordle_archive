@@ -1,3 +1,9 @@
+
+TODO
+ - do a better job of splitting auth from db
+
+
+
 1. send a link to someone to be added to their friends list
 2. they will also be added to your friends list
 3. you can remove people from your friends list
