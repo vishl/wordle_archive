@@ -23,12 +23,16 @@ async function dbSetup(){
   return env;
 }
 
+async function assertEq(env, path, obj){
+  await env.withSecurityRulesDisabled(async context => {
+    let data = await context.database().ref(path).get();
+    expect(data.val()).toEqual(obj);
+  });
+}
+
+
 test('users collection access', async () => {
   const env = await dbSetup();
-
-  // await env.withSecurityRulesDisabled(async context => {
-  //   await context.database().ref('users/foobar4').set({ foo: 'bar' });
-  // });
 
   // unauthed user cannot write to users
   const unauthedDb = env.unauthenticatedContext().database();
@@ -36,13 +40,10 @@ test('users collection access', async () => {
 
   // user should be able to write to their own path
   const authedDb = env.authenticatedContext('bob').database();
-  await assertFails(authedDb.ref('users/bob').update({bar:true}));
-  // If it didn't throw an exception then we're good
+  await assertSucceeds(authedDb.ref('users/bob').update({bar:true}));
 
   // Test that the data is there
-  // await env.withSecurityRulesDisabled(async context => {
-  //   await context.database().ref('users/bob').set({ foo: 'bar' });
-  // });
+  await assertEq(env, 'users/bob', {bar:true})
 
   // user should not be able to write to others paths
   // TODO: test other paths?
