@@ -18,8 +18,8 @@ const firebaseConfig = {
 };
 
 function setup(cb){
-  return new wbDb(firebaseConfig, {local:true, authCallBack:cb});
-
+  let db = new wbDb(firebaseConfig, {local:true, authCallBack:cb});
+  return db;
 }
 
 async function dbSetup(){
@@ -41,7 +41,9 @@ it('should exist', () => {
 });
 
 it('should auth', done => {
+  console.log('test start');
   const db = setup(profile =>{
+    console.log('got callback');
     // This is the callback that is called on successful auth
     expect(true).toBeTruthy();
     expect(profile).not.toBeNull();
@@ -51,24 +53,34 @@ it('should auth', done => {
   db.signIn();
 });
 
-it('basic db', async () => {
-  expect.assertions(1);
+test('users collection access', async () => {
+  expect.assertions(2);
   const env = await dbSetup();
 
   await env.withSecurityRulesDisabled(async context => {
     await context.database().ref('users/foobar4').set({ foo: 'bar' });
   });
 
+
+  // unauthed user cannot write to users
   const unauthedDb = env.unauthenticatedContext().database();
-  // We should not be able to write this
   try {
     await unauthedDb.ref('users/unauth').set({bar:true});
   }catch(e){
+    //expect an error
     expect(e.toString()).toBe('Error: PERMISSION_DENIED: Permission denied');
   }
 
+  // user should be able to write to their own path
   const authedDb = env.authenticatedContext('bob').database();
-  // We should be able to write this
   await authedDb.ref('users/bob').update({bar:true});
   // If it didn't throw an exception then we're good
+
+  // user should not be able to write to others paths
+  try {
+    await authedDb.ref('users/sally').set({bar:true});
+  }catch(e){
+    //expect an error
+    expect(e.toString()).toBe('Error: PERMISSION_DENIED: Permission denied');
+  }
 });

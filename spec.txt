@@ -1,0 +1,112 @@
+1. send a link to someone to be added to their friends list
+2. they will also be added to your friends list
+3. you can remove people from your friends list
+4. if someone is on your friends list, you can see their game history
+5. if you have completed the puzzle for that day, you can see the words that they chose
+6. at the end of a game, you can leave a comment that your friends can see, up to 80 characters
+
+The game state stores the following:
+ - Date of game
+ - List of guesses
+ - Letters used
+ - Comment
+
+
+TODO:
+DONE store game state on gameover
+DONE add name
+DONE look up friend from URL
+DONE add friend
+DONE show all friends in modal
+DONE show friends data if game is over
+DONE cycle through friends
+DONE add name on share screen
+DONE add share url
+DONE update share button
+DONE static build/host
+DONE replace the dude's name everywhere
+DONE remove nav buttons at top
+DONE make it easier to go to the latest game
+split games into a different top level
+permissions
+add stats
+add comment
+add self to friends modal
+show played game if played
+update UI
+icons
+
+BUGS
+wait on friend modal if info modal is showing
+
+improve share modal
+
+
+SCHEMA
+
+users:{
+  'id':{
+    name:'str',
+    userFollows:{  //People that USER follows -- TODO deprecate this
+      id1:{timestamp:<ts>},
+      id2:{timestamp:<ts>},
+      ...},
+    games:[{}...]
+    stats:{
+      currentStreak:0,
+      maxStreak:0,
+      guesses:[0,1,2,3,4,5],
+      lastWin:123
+    }
+  }
+}
+
+//People follow USER
+followsUser:{
+  id1:{
+    id1: {timestamp:<ts>},
+    id2: {timestamp:<ts>},
+  },
+  id2: {...},
+  ...},
+
+
+
+//TODO Userfollows
+userFollows:{  //People that USER follows
+  $uid: {
+      id1:{timestamp:<ts>},
+      id2:{timestamp:<ts>},
+      ...},
+  ...
+}
+
+
+// I don't remember what this thing is for
+
+
+    let gamedata = {
+        gameIndex: day,
+        date:toDate(day),
+        answer: answer,
+        gameState: gameState,
+        board: board,
+        cellStatuses: cellStatuses,
+        letterStatuses: letterStatuses,
+        timestamp: Date.now()
+
+    }
+
+test spec
+create user
+create user profile
+save game
+retrieve game
+add friend
+retrieve friend
+retrieve friends games
+friend has zero games
+user has zero friends
+setting login doesn't blow away other props
+end game with no friends
+end game with friends but no completions

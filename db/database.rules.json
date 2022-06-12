@@ -1,6 +1,18 @@
 {
   "rules": {
     ".read": true,
-    ".write": "auth != null"
+    "users":{
+      "$uid":{
+        ".write": "auth != null && auth.uid == $uid"
+      }
+    },
+    "followsUser":{
+      "$otherId":{
+        "$uid":{
+          ".write": true, //TODO you can only write your own user id in here
+        }
+      }
+    }
+
   }
 }
