@@ -8,6 +8,7 @@ import {
   get, set, ref, child
 } from "firebase/database";
 import { readFileSync, createWriteStream } from 'fs';
+import {createEntry, assertEq} from '../test_helpers';
 
 
 async function dbSetup(){
@@ -21,19 +22,6 @@ async function dbSetup(){
   });
   env.clearDatabase();
   return env;
-}
-
-async function assertEq(env, path, obj){
-  await env.withSecurityRulesDisabled(async context => {
-    let data = await context.database().ref(path).get();
-    expect(data.val()).toEqual(obj);
-  });
-}
-
-async function createEntry(env, path, data){
-  await env.withSecurityRulesDisabled(async context => {
-    await context.database().ref(path).set(data);
-  });
 }
 
 
