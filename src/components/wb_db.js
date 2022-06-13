@@ -27,8 +27,10 @@ export class wbDb {
     if (options.local) {
       console.log("Using local emulation");
       // Point to the RTDB emulator running on localhost.
-      connectAuthEmulator(this._auth, "http://localhost:9099");
-      connectDatabaseEmulator(this._db, "localhost", 9000);
+      if(!this._auth.emulatorConfig){ // during tests connecting multiple times makes it sad
+        connectAuthEmulator(this._auth, "http://localhost:9099");
+        connectDatabaseEmulator(this._db, "localhost", 9000);
+      }
     }
 
 

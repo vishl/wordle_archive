@@ -35,6 +35,15 @@ it('should auth', done => {
   db.signIn();
 });
 
+it('should auth2', done => {
+  const db = setup(profile =>{
+    // This is the callback that is called on successful auth
+    expect(profile).not.toBeNull();
+    done(); // you have to call this to signal the test is over or it will time out
+  });
+  db.signIn();
+});
+
 
 //it('should add friend', done => {
 //  let friendId = 'friend';
