@@ -53,10 +53,6 @@ SCHEMA
 users:{
   'id':{
     name:'str',
-    userFollows:{  //People that USER follows -- TODO deprecate this
-      id1:{timestamp:<ts>},
-      id2:{timestamp:<ts>},
-      ...},
     games:[{}...]
     stats:{
       currentStreak:0,
@@ -78,7 +74,6 @@ followsUser:{
 
 
 
-//TODO Userfollows
 userFollows:{  //People that USER follows
   $uid: {
       id1:{timestamp:<ts>},

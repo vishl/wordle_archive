@@ -1,4 +1,15 @@
 import {wbDb} from './wb_db'
+import {createEntry, assertEq} from '../test_helpers';
+import {
+  assertFails,
+  assertSucceeds,
+  initializeTestEnvironment
+} from "@firebase/rules-unit-testing";
+import {
+  get, set, ref, child
+} from "firebase/database";
+import { readFileSync, createWriteStream } from 'fs';
+
 
 const firebaseConfig = {
   apiKey: 'key',
@@ -12,7 +23,28 @@ const firebaseConfig = {
 };
 
 
-function createUser(id){
+async function createUser(env, id){
+
+  await createEntry(
+    env,
+    `users/${id}`,
+    {
+      name:'name'
+    }
+  );
+}
+
+async function envSetup(){
+  const env = await initializeTestEnvironment({
+    projectId: 'wbfest',
+    database: {
+      host: 'localhost',
+      port: 9000,
+      rules: readFileSync('./db/database.rules.json', 'utf8')
+    },
+  });
+
+  return env;
 }
 
 function setup(cb){
@@ -20,50 +52,42 @@ function setup(cb){
   return db;
 }
 
-it('should exist', () => {
-  const db = setup();
-  expect(true).toBeTruthy();
-  db.signIn();
-});
-
 it('should auth', done => {
-  const db = setup(profile =>{
+  const db = setup(async profile =>{
     // This is the callback that is called on successful auth
     expect(profile).not.toBeNull();
+    await db.signOut();
     done(); // you have to call this to signal the test is over or it will time out
   });
   db.signIn();
+
 });
 
-it('should auth2', done => {
-  const db = setup(profile =>{
+it('should add friend', async done => {
+  console.log('start test');
+  let friendId = 'friend';
+  //create user1
+  //sign in as user2
+  const env = await envSetup();
+  await createUser(env, friendId);
+  console.log('created user');
+  const db = setup(async profile =>{
     // This is the callback that is called on successful auth
-    expect(profile).not.toBeNull();
+    console.log('got callback');
+    //add user1 as friend
+    let ret = await db.addFriendWithId(friendId);
+    expect(ret).toEqual({name:'name'})
+
     done(); // you have to call this to signal the test is over or it will time out
   });
+  console.log('signing in');
   db.signIn();
+
 });
-
-
-//it('should add friend', done => {
-//  let friendId = 'friend';
-//  //create user1
-//  //sign in as user2
-//  const db = setup(profile =>{
-//    // This is the callback that is called on successful auth
-//    //add user1 as friend
-
-//    db.addFriendWithId(friendId);
-
-
-//    done(); // you have to call this to signal the test is over or it will time out
-//  });
-//  db.signIn();
-
-//});
 
 
 //TODO: addFriend,
+//      try to add friend that doesn't exist
 //      create new user,
 //      getFriends,
 //      don't add self as friend

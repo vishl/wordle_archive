@@ -1,7 +1,13 @@
 
 import { initializeApp as fbInit } from "firebase/app";
 import { getAnalytics as fbGetAnalytics, isSupported as fbAnalyticsIsSupported } from "firebase/analytics";
-import { getAuth, signInAnonymously, onAuthStateChanged, connectAuthEmulator} from "firebase/auth";
+import {
+  getAuth,
+  signInAnonymously,
+  signOut,
+  onAuthStateChanged,
+  connectAuthEmulator
+} from "firebase/auth";
 import { getDatabase,
   connectDatabaseEmulator,
   get as fbGet,
@@ -146,6 +152,9 @@ export class wbDb {
     const updates = {};
     updates[`${this._userFollowsPath(id)}`] = friendData;
     updates[`${this._followsUserPath(id)}`] = friendData;
+
+    console.log('updating');
+    console.log(updates);
     //NB: This appears to call Set on each path here, not update...?? Why
     return fbUpdate(fbRef(this._db), updates);
   }
@@ -225,6 +234,10 @@ export class wbDb {
 
     // only Anon is supported right now
     return signInAnonymously(this._auth)
+  }
+
+  signOut(){
+    return signOut(this._auth);
   }
 
   logGame(st){
