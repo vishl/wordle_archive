@@ -10,7 +10,7 @@ import {
 
 export async function createEntry(env, path, data){
   await env.withSecurityRulesDisabled(async context => {
-    await context.database().ref(path).set(data);
+    await context.database().ref(path).update(data);
   });
 }
 

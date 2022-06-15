@@ -63,7 +63,7 @@ it('should auth', done => {
 
 });
 
-it('should add friend', async done => {
+it('should add friend', async () => {
   console.log('start test');
   let friendId = 'friend';
   //create user1
@@ -71,17 +71,22 @@ it('should add friend', async done => {
   const env = await envSetup();
   await createUser(env, friendId);
   console.log('created user');
-  const db = setup(async profile =>{
-    // This is the callback that is called on successful auth
-    console.log('got callback');
-    //add user1 as friend
-    let ret = await db.addFriendWithId(friendId);
-    expect(ret).toEqual({name:'name'})
 
-    done(); // you have to call this to signal the test is over or it will time out
+  let p = new Promise((resolve, reject) => {
+    const db = setup(async profile =>{
+      // This is the callback that is called on successful auth
+      console.log('got callback');
+      //add user1 as friend
+      let ret = await db.addFriendWithId(friendId);
+      expect(ret).toEqual({name:'name'})
+
+      resolve();
+    });
+    console.log('signing in');
+    db.signIn();
   });
-  console.log('signing in');
-  db.signIn();
+
+  return p;
 
 });
 

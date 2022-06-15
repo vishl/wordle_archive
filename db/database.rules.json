@@ -14,7 +14,12 @@
           ".write": "auth != null && auth.uid == $uid"
         }
       }
+    },
+    "userFollows":{
+      "$uid":{
+        //You can only update followers for yourself
+        ".write": "auth != null && auth.uid == $uid"
+      }
     }
-
   }
 }

@@ -63,12 +63,40 @@ test('write to followsUser collection', async() => {
 
   assertEq(env, path, {
     user2:0,
-    userId:0
+    bob:0
   });
 
   //should not be able to write anything else as a follower
 
   packet = {baz:0}
   await assertFails(authedDb.ref(path).update(packet));
+
+});
+
+test('write to userFollows collection', async() => {
+  const env = await dbSetup();
+
+  let path = 'userFollows/bob';
+  let userId = 'bob'
+  let friendId = 'user1'
+
+  //create an entry for bob follows user2
+  await createEntry(env, path, {user2:0});
+
+  //auth as bob
+  const authedDb = env.authenticatedContext(userId).database();
+
+  //should be able to set user as someone self follows
+  let packet = {};
+  packet[friendId] = 0;
+  await assertSucceeds(authedDb.ref(path).update(packet));
+
+  assertEq(env, path, {
+    user2:0,
+    user1:0
+  });
+
+  //should not be able to update another users followers
+  await assertFails(authedDb.ref('/userFollows/baz').update(packet));
 
 });
