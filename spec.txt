@@ -19,6 +19,31 @@ The game state stores the following:
 
 
 TODO:
+add version numbers
+add stats
+add comment
+add self to friends modal
+show played game if played
+update UI
+icons
+build system
+add tooltips for go to latest game, friends
+improve share modal
+change numbers to dates
+add a calendar view
+
+split games into a different top level -- why?
+
+BUGS
+fit vertically
+wait on friend modal if info modal is showing
+bug where if you navigate using arrows to a played game it doesn't load
+title and favicon not showing on chrome ios..? Chrome only, forget it
+
+
+
+
+
 DONE store game state on gameover
 DONE add name
 DONE look up friend from URL
@@ -33,19 +58,7 @@ DONE static build/host
 DONE replace the dude's name everywhere
 DONE remove nav buttons at top
 DONE make it easier to go to the latest game
-split games into a different top level
-permissions
-add stats
-add comment
-add self to friends modal
-show played game if played
-update UI
-icons
-
-BUGS
-wait on friend modal if info modal is showing
-
-improve share modal
+DONE permissions
 
 
 SCHEMA

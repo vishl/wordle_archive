@@ -1,6 +1,7 @@
 import { ReactComponent as Github } from '../data/Github.svg'
 import { ReactComponent as Close } from '../data/Close.svg'
 import Modal from 'react-modal'
+import metadata from '../metadata.json'
 
 Modal.setAppElement('#root')
 
@@ -64,6 +65,10 @@ export const InfoModal = ({ isOpen, handleClose, darkMode, colorBlindMode, style
           >
             <Github />
           </a>
+        </div>
+
+        <div className="flex justify-center sm:text-base text-sm">
+          <span>{`Version ${metadata.buildMajor}.${metadata.buildMinor}.${metadata.buildRevision} ${metadata.buildTag}`}</span>
         </div>
       </div>
     </div>

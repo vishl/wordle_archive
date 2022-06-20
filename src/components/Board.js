@@ -49,7 +49,7 @@ export default function Board({
     if(mode === 'small'){
       s += ' inline-flex items-center font-medium justify-center text-xl w-[7vw] h-[7vw] xs:w-7 xs:h-7 sm:w-7 sm:h-7 rounded';
     }else{
-      s += ' inline-flex items-center font-medium justify-center text-xl w-[14vw] h-[14vw] xs:w-14 xs:h-14 sm:w-20 sm:h-20 rounded';
+      s += ' inline-flex items-center font-medium justify-center text-xl w-[12vw] h-[12vw] xs:w-14 xs:h-14 sm:w-20 sm:h-20 rounded';
     }
     return s;
   }

@@ -1,3 +1,4 @@
+.PHONY: emulator test build ssh
 
 emulator:
 	cd db && firebase emulators:start
@@ -9,6 +10,7 @@ deploydb:
 	cd db && firebase deploy --only database
 
 build:
+	node generate-buildno.js
 	npm run build
 
 deployapp: build
