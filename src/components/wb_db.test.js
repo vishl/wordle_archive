@@ -91,7 +91,7 @@ it('should add friend', async () => {
 });
 
 
-//TODO: addFriend,
+//TODO: DONE addFriend,
 //      try to add friend that doesn't exist
 //      create new user,
 //      getFriends,
