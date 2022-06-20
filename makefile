@@ -9,12 +9,14 @@ test:
 deploydb:
 	cd db && firebase deploy --only database
 
-build:
+build: build/index.html
+
+build/index.html: ${shell find src -type f}
 	node generate-buildno.js
 	npm run build
 
 deployapp: build
-	scp -r -P 21098 ./build  wordzkvk@wordbird.app:public_html
+	scp -r -P 21098 ./build/*  wordzkvk@wordbird.app:public_html/
 
 deploy: deploydb deployapp
 
